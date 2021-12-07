@@ -5,6 +5,12 @@ on:
     secrets:
       SECRET_KEY:
         required: true
+      CLOUDINARY_NAME:
+        required: true
+      CLOUDINARY_API_KEY:
+        required: true
+      CLOUDINARY_SECRET:
+        required: true
 
 jobs:
   build:
@@ -23,6 +29,7 @@ jobs:
           pip install -r requirements.txt
       - name: test secrets
         run: |
+          echo "hello ${{ env.SECRET_KEY }}"
           echo "hello ${{ env.SECRET_KEY }}"
       - name: Run Tests
         run: |
