@@ -9,6 +9,9 @@ jobs:
     uses: Ken-mbira/SHOPS_GALORE/.github/workflows/test.yaml@development
     secrets:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_SECRET: ${{ secrets.CLOUDINARY_SECRET }}
 
   deploy:
     needs: call-workflow
