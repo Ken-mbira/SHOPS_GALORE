@@ -36,3 +36,6 @@ jobs:
           python3.8 manage.py test
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_SECRET: ${{ secrets.CLOUDINARY_SECRET }}
