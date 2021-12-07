@@ -11,4 +11,6 @@ class TestViews(TestSetUp):
       """
       This tests whether a user can register in the website"""
       res = self.client.post(self.register_url,self.user_data)
-      self.assertEqual(res.status_code,status.HTTP_200_OK)  
+      self.assertEqual(res.status_code,status.HTTP_200_OK)
+      user = User.objects.get(email = self.user_data['email'])
+      self.assertEqual(user.first_name,self.user_data['first_name'])
