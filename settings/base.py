@@ -41,12 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.account',
     'drf_yasg',
     'phonenumber_field',
     'cloudinary',
     'rest_framework',
+    'apps.account',
 ]
+
+LOGIN_REDIRECT_URL = ''
 
 # user model
 AUTH_USER_MODEL = 'account.User'
