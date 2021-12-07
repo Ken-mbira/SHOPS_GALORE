@@ -5,6 +5,12 @@ on:
     secrets:
       SECRET_KEY:
         required: true
+      CLOUDINARY_NAME:
+        required: true
+      CLOUDINARY_API_KEY:
+        required: true
+      CLOUDINARY_SECRET:
+        required: true
 
 jobs:
   build:
