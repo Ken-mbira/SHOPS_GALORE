@@ -57,4 +57,46 @@ class TestViews(TestSetUp):
 
         token = self.client.post(self.login_url,self.login_credentials).data
         instance = self.client.get(self.login_url + f"{token}")
-        self.assertEqual(correct_instance,instance.data)        
+        self.assertEqual(correct_instance,instance.data)  
+
+    def authenticate(self,user_data):
+        response = self.client.post(self.login_url,user_data)
+        self.client.credentials(HTTP_AUTHORIZATION = f"Token {response.data}")
+
+    def test_update_profile(self):
+        """This test whether a user can update their own profile
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        new_profile = {
+            "bio":"This is my new bio",
+            "phone_number":"+254722123456",
+            "location":"Kiserian"
+        }
+
+        self.client.put(self.profile_url,new_profile)
+
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).profile.bio,new_profile['bio'])
+
+    def test_get_profile(self):
+        """This checks if a user can view their own profile
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        correct_instance = ProfileSerializer(Profile.objects.get(user = user)).data
+
+        instance = self.client.get(self.profile_url)
+
+        self.assertEqual(instance.data,correct_instance)

@@ -1,10 +1,11 @@
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.schemas import get_schema_view
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from apps.account.tokens import account_activation_token
+from apps.account.permissions import *
 
 from apps.account.serializers import *
 from apps.account.models import *
@@ -90,3 +91,30 @@ class ActivateAccount(APIView):
         else:
             data = 'The confirmation link was invalid, possibly because it has already been used.'
             return Response(data,status.HTTP_400_BAD_REQUEST)
+
+class ProfileView(APIView):
+    """This handles a users profile
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsOwnerOrReadOnly]
+
+    @swagger_auto_schema(responses={200: ProfileSerializer()})
+    def get(self,request,format=None):
+        profile = Profile.objects.get(user = request.user)
+        data = ProfileSerializer(profile).data
+        return Response(data,status.HTTP_200_OK)
+
+    @swagger_auto_schema(request_body= ProfileSerializer,responses={200: ProfileSerializer()})
+    def put(self,request,format=None):
+        serializer = ProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            profile = serializer.update(Profile.objects.get(user = request.user))
+            data = ProfileSerializer(profile).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
