@@ -138,3 +138,23 @@ class ToggleNotificationView(APIView):
             data = serializer.errors
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
+
+class UpdateProfilePic(APIView):
+    """This toggles a user preference for receiving notifications via email
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsOwnerOrReadOnly]
+
+    @swagger_auto_schema(request_body= ProfilePicSerializer,responses={200: ProfileSerializer()})
+    def put(self,request,format=None):
+        serializer = ProfilePicSerializer(data=request.data)
+        if serializer.is_valid():
+            profile = serializer.update_profile_pic(request)
+            data = ProfileSerializer(profile).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)

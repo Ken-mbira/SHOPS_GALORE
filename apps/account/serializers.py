@@ -102,3 +102,17 @@ class NotificationPreferenceSerializer(serializers.Serializer):
         profile.receive_notifications_via_email = self.validated_data['preference']
         profile.save()
         return profile
+
+class ProfilePicSerializer(serializers.Serializer):
+    """This handles updating the profile pic of a user
+
+    Args:
+        serializers ([type]): [description]
+    """
+    avatar = serializers.ImageField(required=True)
+
+    def update_profile_pic(self,request):
+        profile = Profile.objects.get(user = request.user)
+        profile.avatar = self.validated_data['avatar']
+        profile.save()
+        return profile
