@@ -6,6 +6,7 @@ from apps.account.models import *
 class TestSetUp(APITestCase):
     def setUp(self):
         self.register_url = reverse('create_user')
+        self.login_url = reverse('login')
 
         if len(Role.objects.all()) < 4:
             Role.objects.create(name="staff")
@@ -19,6 +20,11 @@ class TestSetUp(APITestCase):
             "last_name":"cb",
             "email":"kevo@gmail.com",
             "role":2
+        }
+
+        self.login_credentials = {
+            "email":"kevo@gmail.com",
+            "password":"1234"
         }
         return super().setUp()
 
