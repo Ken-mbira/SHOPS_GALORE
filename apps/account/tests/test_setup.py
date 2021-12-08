@@ -8,6 +8,7 @@ class TestSetUp(APITestCase):
         self.register_url = reverse('create_user')
         self.login_url = reverse('login')
         self.profile_url = reverse('profile')
+        self.notification_url = reverse('notification')
 
         if len(Role.objects.all()) < 4:
             Role.objects.create(name="staff")

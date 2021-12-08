@@ -100,4 +100,5 @@ class NotificationPreferenceSerializer(serializers.Serializer):
     def change_preference(self,request):
         profile = Profile.objects.get(user = request.user)
         profile.receive_notifications_via_email = self.validated_data['preference']
+        profile.save()
         return profile
