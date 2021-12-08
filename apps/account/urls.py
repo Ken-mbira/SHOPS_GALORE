@@ -8,4 +8,5 @@ urlpatterns = [
     path('login/<token>',views.UserInstanceView.as_view(),name="user_instance"),
     path('activate/<uidb64>/<token>/', views.ActivateAccount.as_view(), name='activate'),
     path('api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+    path('profile/',views.ProfileView.as_view(),name="profile"),
 ]
