@@ -70,11 +70,11 @@ REST_FRAMEWORK = {
 
 LOGIN_REDIRECT_URL = ''
 
-cloudinary.config(
-  cloud_name = config('CLOUDINARY_NAME'),  
-  api_key = config('CLOUDINARY_API_KEY'),  
-  api_secret = config('CLOUDINARY_SECRET')  
-)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_SECRET')
+}
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
