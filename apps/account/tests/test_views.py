@@ -80,6 +80,6 @@ class TestViews(TestSetUp):
             "location":"Kiserian"
         }
 
-        response = self.client.put(self.profile_url,new_profile)
+        self.client.put(self.profile_url,new_profile)
 
-        print(response)
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).profile.bio,new_profile['bio'])
