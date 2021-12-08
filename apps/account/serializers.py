@@ -93,3 +93,11 @@ class LoginSerializer(serializers.Serializer):
 
         else:
             raise serializers.ValidationError('The user could not be validated with the provided credentials.')
+
+class NotificationPreferenceSerializer(serializers.Serializer):
+    preference = serializers.BooleanField(required=True,label="The user's preference")
+
+    def change_preference(self,request):
+        profile = Profile.objects.get(user = request.user)
+        profile.receive_notifications_via_email = self.validated_data['preference']
+        return profile
