@@ -31,6 +31,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# user model
+AUTH_USER_MODEL = 'account.User'
+
 
 # Application definition
 
@@ -46,12 +49,18 @@ INSTALLED_APPS = [
     'cloudinary',
     'rest_framework',
     'apps.account',
+    'rest_framework.authtoken',
 ]
 
-LOGIN_REDIRECT_URL = ''
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
-# user model
-AUTH_USER_MODEL = 'account.User'
+LOGIN_REDIRECT_URL = ''
 
 cloudinary.config(
   cloud_name = config('CLOUDINARY_NAME'),  
