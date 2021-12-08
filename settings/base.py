@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'apps.account',
     'rest_framework.authtoken',
+    'django_rest_passwordreset',
 ]
 
 REST_FRAMEWORK = {
