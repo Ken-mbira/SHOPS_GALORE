@@ -37,15 +37,14 @@ class LoginView(APIView):
     Returns:
         [type]: [description]
     """
-    @swagger_auto_schema(request_body=LoginSerializer,responses={200: GetUserSerializer()})
+    @swagger_auto_schema(request_body=LoginSerializer,responses={200: "User Token"})
     def post(self,request,format=None):
         data = {}
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validate_user()
-            data['user'] = GetUserSerializer(user).data
             token, created = Token.objects.get_or_create(user=user)
-            data['token'] = token.key
+            data = token.key
             responseStatus = status.HTTP_200_OK
             return Response(data,status = responseStatus)
 
