@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.sites.shortcuts import get_current_site
+from phonenumber_field.modelfields import PhoneNumberField
 
 from apps.account.models import *
 from apps.account.emails import send_account_activation_email
@@ -40,9 +41,19 @@ class ProfileSerializer(serializers.ModelSerializer):
     Args:
         serializers ([type]): [description]
     """
+    phone_number = PhoneNumberField(region="KE")
     class Meta:
         model = Profile
         fields = '__all__'
+        read_only_fields = ['user','avatar','gender','receive_notifications_via_email']
+
+    def update(self,instance):
+
+        instance.phone_number = self.validated_data['phone_number']
+        instance.bio = self.validated_data['bio']
+        instance.location = self.validated_data['location']
+        instance.save()
+        return instance
 
 class GetUserSerializer(serializers.ModelSerializer):
     """This deals with getting a user instance
