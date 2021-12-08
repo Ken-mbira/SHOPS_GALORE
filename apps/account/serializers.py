@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from django.contrib.auth import authenticate
+from django.contrib.sites.shortcuts import get_current_site
 
 from apps.account.models import *
-from django.contrib.auth import authenticate
+from apps.account.emails import send_account_activation_email
 
 class RegisterSerializer(serializers.ModelSerializer):
     """This defines the fields involved in creation of a user
@@ -13,10 +15,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['password','email','role','first_name','last_name']
 
-    def save(self):
+    def save(self,request):
         user = User(first_name = self.validated_data['first_name'], last_name=self.validated_data['last_name'],email=self.validated_data['email'],role=self.validated_data['role'])
         user.set_password(self.validated_data['password'])
+        user.is_active = False
         user.save()
+        current_site = get_current_site(request)
+        send_account_activation_email(current_site,user)
         return user
 
 class RoleSerializer(serializers.ModelSerializer):

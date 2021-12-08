@@ -1,0 +1,8 @@
+<div style="display: flex;justify-content:center;width: 100%">
+    <div>
+        <h1>Welcome to SHOPS GALORE {{user.first_name}},</h1>
+        <p>Best of wishes as you embark on your journey as a {{user.role.name}}</p>
+        <p>Click on the following link to activate your account</p>
+        <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}">Click me</a>
+    </div>
+</div>
