@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 
 from apps.account.models import *
+from apps.account.serializers import *
 
 class TestViews(TestSetUp):
     def test_roles(self):
@@ -39,3 +40,14 @@ class TestViews(TestSetUp):
         res = self.client.post(self.login_url,wrong_credentials)
 
         self.assertEqual(res.status_code,status.HTTP_400_BAD_REQUEST)
+
+    def test_get_user_instance(self):
+        """This tests whether the get user instance endpoint returns a user instance
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        correct_instance = GetUserSerializer(User.objects.get(email = self.login_credentials['email'])).data
+
+        token = self.client.post(self.login_url,self.login_credentials).data
+        instance = self.client.get(self.login_url + f"{token}")
+        self.assertEqual(correct_instance,instance.data)        
