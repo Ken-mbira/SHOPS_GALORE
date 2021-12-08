@@ -1,10 +1,10 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.schemas import get_schema_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from apps.account.tokens import account_activation_token
 
 from apps.account.serializers import *
 from apps.account.models import *
@@ -20,7 +20,7 @@ class UserView(APIView):
     def post(self,request,format=None):
         serializer = RegisterSerializer(data = request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(request)
             data = "Your account was created successfully"
             responseStatus = status.HTTP_200_OK
         else:
@@ -70,3 +70,23 @@ class UserInstanceView(APIView):
             responseStatus = status.HTTP_404_NOT_FOUND
 
         return Response(data,status=responseStatus)
+
+
+class ActivateAccount(APIView):
+    def get(self, request, uidb64, token, *args, **kwargs):
+        data = {}
+        try:
+            uid = uidb64
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and account_activation_token.check_token(user, token):
+            user.is_active = True
+            user.save()
+            data['success'] = "Your account was successfully activated"
+
+            return Response(data,status = status.HTTP_200_OK)
+        else:
+            data = 'The confirmation link was invalid, possibly because it has already been used.'
+            return Response(data,status.HTTP_400_BAD_REQUEST)

@@ -1,6 +1,7 @@
 from apps.account.tests.test_setup import TestSetUp
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from django.core import mail
 
 from apps.account.models import *
 from apps.account.serializers import *
@@ -17,17 +18,19 @@ class TestViews(TestSetUp):
       user = User.objects.get(email = self.user_data['email'])
       self.assertEqual(user.first_name,self.user_data['first_name'])
 
-    def test_login_user(self):
-        """This tests whether a user can login with correct credentials
+    def test_login_user_without_activation(self):
+        """This tests whether a user can login while not activated account
         """
         self.client.post(self.register_url,self.user_data)
         res = self.client.post(self.login_url,self.login_credentials)
 
-        self.assertEqual(res.status_code,status.HTTP_200_OK)
+        self.assertEqual(res.status_code,status.HTTP_400_BAD_REQUEST)
 
-        token = Token.objects.get(user = User.objects.get(email = self.login_credentials['email']))
-
-        self.assertEqual(token.key,res.data)
+    def test_user_activation(self):
+        """This will test whether a user receives an account activation email
+        """
+        self.client.post(self.register_url,self.user_data)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_wrong_login_user(self):
         """This tests whether a user can login with incorrect credentials
@@ -45,6 +48,10 @@ class TestViews(TestSetUp):
         """This tests whether the get user instance endpoint returns a user instance
         """
         self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
 
         correct_instance = GetUserSerializer(User.objects.get(email = self.login_credentials['email'])).data
 
