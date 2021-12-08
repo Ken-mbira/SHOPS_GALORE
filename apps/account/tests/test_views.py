@@ -83,3 +83,20 @@ class TestViews(TestSetUp):
         self.client.put(self.profile_url,new_profile)
 
         self.assertEqual(User.objects.get(email = self.login_credentials['email']).profile.bio,new_profile['bio'])
+
+    def test_get_profile(self):
+        """This checks if a user can view their own profile
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        correct_instance = ProfileSerializer(Profile.objects.get(user = user)).data
+
+        instance = self.client.get(self.profile_url)
+
+        self.assertEqual(instance.data,correct_instance)
