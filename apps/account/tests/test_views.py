@@ -100,3 +100,28 @@ class TestViews(TestSetUp):
         instance = self.client.get(self.profile_url)
 
         self.assertEqual(instance.data,correct_instance)
+
+    def test_change_notification_preference(self):
+        """This test whether a user can change their notification preference
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        new_preference = {
+            "preference":False
+        }
+
+        self.client.put(self.notification_url,new_preference)
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).profile.receive_notifications_via_email,new_preference['preference'])
+
+        other_preference = {
+            "preference":False
+        }
+
+        self.client.put(self.notification_url,other_preference)
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).profile.receive_notifications_via_email,other_preference['preference'])
