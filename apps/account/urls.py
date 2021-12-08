@@ -10,4 +10,5 @@ urlpatterns = [
     path('api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('profile/',views.ProfileView.as_view(),name="profile"),
     path('notification_preference/',views.ToggleNotificationView.as_view(),name="notification"),
+    path('profile_pic/',views.UpdateProfilePic.as_view(),name="profile_pic"),
 ]
