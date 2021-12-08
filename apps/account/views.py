@@ -51,3 +51,22 @@ class LoginView(APIView):
         else:
             data = serializer.errors
             return Response(data,status = status.HTTP_400_BAD_REQUEST)
+
+class UserInstanceView(APIView):
+    """This return a user instance
+
+    Args:
+        APIView ([type]): [description]
+    """
+    @swagger_auto_schema(responses={200: GetUserSerializer()})
+    def get(self,request,token):
+        data = {}
+        try:
+            validated_token = Token.objects.get(key=token)
+            data = GetUserSerializer(validated_token.user).data
+            responseStatus = status.HTTP_200_OK
+        except:
+            data = "The token does not exist!"
+            responseStatus = status.HTTP_404_NOT_FOUND
+
+        return Response(data,status=responseStatus)
