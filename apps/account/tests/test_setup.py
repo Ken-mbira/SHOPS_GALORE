@@ -13,7 +13,8 @@ class TestSetUp(APITestCase):
             Role.objects.create(name="delivery")
             Role.objects.create(name="customer")
 
-        user_data = {
+        self.user_data = {
+            "password":"1234",
             "first_name":"Kevo",
             "last_name":"cb",
             "email":"kevo@gmail.com",
