@@ -173,3 +173,36 @@ class TestViews(TestSetUp):
 
         response = self.client.post(self.deactivate_other_url,{"user":another_user.pk})
         self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
+
+    def test_deactivate_user_while_authorised(self):
+        """This will test whether an authorised user can deactivate antother user
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        authorised_user_data = {
+            "password":"1234",
+            "first_name":"Machel",
+            "last_name":"Mwokovu",
+            "email":"mwokovu@gmail.com",
+            "role":1
+        }
+        authorised_credentials = {
+            "email":authorised_user_data['email'],
+            "password":authorised_user_data['password']
+        }
+
+        self.client.post(self.register_url,authorised_user_data)
+
+        another_user = User.objects.get(email = authorised_credentials['email'])
+        another_user.is_active = True
+        another_user.save()
+
+        self.authenticate(authorised_credentials)
+
+        response = self.client.post(self.deactivate_other_url,{"user":user.pk})
+        self.assertTrue(response.status_code,status.HTTP_200_OK)
+        self.assertTrue(User.objects.get(email = authorised_credentials['email']).is_active,False)
