@@ -145,3 +145,31 @@ class TestViews(TestSetUp):
 
         auth_status = self.authenticate(self.login_credentials)
         self.assertEqual(auth_status.status_code,status.HTTP_401_UNAUTHORIZED)
+
+    def test_non_staff_deactivate_other_user(self):
+        """This will test if a user who is not a staff can deactivate another user's account
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        another_user_data = {
+            "password":"1234",
+            "first_name":"Machel",
+            "last_name":"Mwokovu",
+            "email":"mwokovu@gmail.com",
+            "role":2
+        }
+
+        self.client.post(self.register_url,another_user_data)
+
+        another_user = User.objects.get(email = self.login_credentials['email'])
+        another_user.is_active = True
+        another_user.save()
+
+        response = self.client.post(self.deactivate_other_url,{"user":another_user.pk})
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
