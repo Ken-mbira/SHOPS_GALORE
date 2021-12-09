@@ -62,6 +62,7 @@ class TestViews(TestSetUp):
     def authenticate(self,user_data):
         response = self.client.post(self.login_url,user_data)
         self.client.credentials(HTTP_AUTHORIZATION = f"Token {response.data}")
+        return response
 
     def test_update_profile(self):
         """This test whether a user can update their own profile
@@ -125,3 +126,22 @@ class TestViews(TestSetUp):
 
         self.client.put(self.notification_url,other_preference)
         self.assertEqual(User.objects.get(email = self.login_credentials['email']).profile.receive_notifications_via_email,other_preference['preference'])
+
+    def test_deactivate_account(self):
+        """"
+        This will test if a user can deactivate their account"""
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        response = self.client.put(self.deactivate_url)
+
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).is_active,False)
+
+        auth_status = self.authenticate(self.login_credentials)
+        self.assertEqual(auth_status.status_code,status.HTTP_401_UNAUTHORIZED)

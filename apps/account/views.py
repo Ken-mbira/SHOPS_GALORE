@@ -158,3 +158,16 @@ class UpdateProfilePic(APIView):
             data = serializer.errors
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
+
+class DeactivateAccount(APIView):
+    """This handles a users request to have their account deactivated
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsOwnerOrReadOnly]
+
+    def put(self,request,format=None):
+        request.user.deactivate_account()
+        data = "Your account was deactivated"
+        return Response(data,status=status.HTTP_200_OK)

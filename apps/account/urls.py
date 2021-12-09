@@ -11,4 +11,5 @@ urlpatterns = [
     path('profile/',views.ProfileView.as_view(),name="profile"),
     path('notification_preference/',views.ToggleNotificationView.as_view(),name="notification"),
     path('profile_pic/',views.UpdateProfilePic.as_view(),name="profile_pic"),
+    path('deactivate_account/',views.DeactivateAccount.as_view(),name="deactivate"),
 ]
