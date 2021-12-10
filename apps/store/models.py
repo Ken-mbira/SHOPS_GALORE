@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 from phonenumber_field.modelfields import PhoneNumberField
 from mptt.models import MPTTModel, TreeForeignKey
@@ -19,10 +20,18 @@ class Shop(models.Model):
     pickup_location = models.CharField(max_length=50)
     phone_contact = PhoneNumberField(region="KE")
     email_contact = models.EmailField()
-    active = models.BooleanField(default=True)
+    subscription_end_date = models.DateField()
+
 
     def __str__(self):
         return self.name
+
+    @property
+    def active(self):
+        if datetime(self.subscription_end_date) < datetime.now() or (self.owner.is_active == False):
+            return False
+        return True
+
 
 
 class Brand(models.Model):
@@ -124,6 +133,12 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def active(self):
+        if self.owner.active:
+            return True
+        return False
 
 class Stock(models.Model):
     """This defines the quantities of the products
