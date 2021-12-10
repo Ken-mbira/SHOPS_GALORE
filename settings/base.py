@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'apps.store',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
+    'mptt',
 ]
 
 REST_FRAMEWORK = {
