@@ -62,6 +62,7 @@ class TestViews(TestSetUp):
     def authenticate(self,user_data):
         response = self.client.post(self.login_url,user_data)
         self.client.credentials(HTTP_AUTHORIZATION = f"Token {response.data}")
+        return response
 
     def test_update_profile(self):
         """This test whether a user can update their own profile
@@ -125,3 +126,119 @@ class TestViews(TestSetUp):
 
         self.client.put(self.notification_url,other_preference)
         self.assertEqual(User.objects.get(email = self.login_credentials['email']).profile.receive_notifications_via_email,other_preference['preference'])
+
+    def test_deactivate_account(self):
+        """"
+        This will test if a user can deactivate their account"""
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        response = self.client.put(self.deactivate_url)
+
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).is_active,False)
+
+        auth_status = self.authenticate(self.login_credentials)
+        self.assertEqual(auth_status.status_code,status.HTTP_401_UNAUTHORIZED)
+
+    def test_non_staff_deactivate_other_user(self):
+        """This will test if a user who is not a staff can deactivate another user's account
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        another_user_data = {
+            "password":"1234",
+            "first_name":"Machel",
+            "last_name":"Mwokovu",
+            "email":"mwokovu@gmail.com",
+            "role":2
+        }
+
+        self.client.post(self.register_url,another_user_data)
+
+        another_user = User.objects.get(email = self.login_credentials['email'])
+        another_user.is_active = True
+        another_user.save()
+
+        response = self.client.post(self.deactivate_other_url,{"user":another_user.pk})
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
+
+    def test_deactivate_user_while_authorised(self):
+        """This will test whether an authorised user can deactivate antother user
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        authorised_user_data = {
+            "password":"1234",
+            "first_name":"Machel",
+            "last_name":"Mwokovu",
+            "email":"mwokovu@gmail.com",
+            "role":1
+        }
+        authorised_credentials = {
+            "email":authorised_user_data['email'],
+            "password":authorised_user_data['password']
+        }
+
+        self.client.post(self.register_url,authorised_user_data)
+
+        another_user = User.objects.get(email = authorised_credentials['email'])
+        another_user.is_active = True
+        another_user.save()
+
+        self.authenticate(authorised_credentials)
+
+        response = self.client.post(self.deactivate_other_url,{"user":user.pk})
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).is_active,False)
+
+    def test_reinstate_user_while_authorised(self):
+        """This will test whether an authorised user can reistate user after being deactivated
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        authorised_user_data = {
+            "password":"1234",
+            "first_name":"Machel",
+            "last_name":"Mwokovu",
+            "email":"mwokovu@gmail.com",
+            "role":1
+        }
+        authorised_credentials = {
+            "email":authorised_user_data['email'],
+            "password":authorised_user_data['password']
+        }
+
+        self.client.post(self.register_url,authorised_user_data)
+
+        another_user = User.objects.get(email = authorised_credentials['email'])
+        another_user.is_active = True
+        another_user.save()
+
+        self.authenticate(authorised_credentials)
+
+        self.client.post(self.deactivate_other_url,{"user":user.pk})
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).is_active,False)
+
+        response = self.client.post(self.reinstate_url,{"user":user.pk})
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).is_active,True)

@@ -90,6 +90,18 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.first_name + " " + self.last_name
 
+    def deactivate_account(self):
+        """
+        This makes a user's account inactive"""
+        self.is_active = False
+        self.save()
+
+    def reinstate(self):
+        """This allows for a users whose account was inactive to be reinstated
+        """
+        self.is_active = True
+        self.save()
+
 MALE = "Male"
 FEMALE = "Female"
 RATHER_NOT_SAY = "Rather_Not_Say"

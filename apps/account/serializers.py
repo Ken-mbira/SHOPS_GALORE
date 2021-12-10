@@ -116,3 +116,32 @@ class ProfilePicSerializer(serializers.Serializer):
         profile.avatar = self.validated_data['avatar']
         profile.save()
         return profile
+
+class AccountStatusSerializer(serializers.Serializer):
+    """This handles activating or deactivating another users account
+
+    Args:
+        serializers ([type]): [description]
+    """
+    user = serializers.CharField(required=True)
+
+    def validate_instance(self):
+        """This validates if the user instance is valid
+        """
+        try:
+            User.objects.get(pk = self.validated_data['user'])
+            return True
+        except:
+            raise serializers.ValidationError("The user instance could not be found")
+
+    def deactivate_user(self):
+        """this handles deactivation of a user's account
+        """
+        user = User.objects.get(pk = self.validated_data['user'])
+        user.deactivate_account()
+
+    def reinstate_user(self):
+        """This handles the reinstation of a user
+        """
+        user = User.objects.get(pk = self.validated_data['user'])
+        user.reinstate()
