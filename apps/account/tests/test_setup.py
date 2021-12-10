@@ -11,6 +11,7 @@ class TestSetUp(APITestCase):
         self.notification_url = reverse('notification')
         self.deactivate_url = reverse('deactivate')
         self.deactivate_other_url = reverse('deactivate_other')
+        self.reinstate_url = reverse('reinstate')
 
         if len(Role.objects.all()) < 4:
             Role.objects.create(name="staff")

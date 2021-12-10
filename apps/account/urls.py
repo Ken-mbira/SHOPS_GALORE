@@ -12,5 +12,6 @@ urlpatterns = [
     path('notification_preference/',views.ToggleNotificationView.as_view(),name="notification"),
     path('profile_pic/',views.UpdateProfilePic.as_view(),name="profile_pic"),
     path('deactivate_own/',views.DeactivateOwnAccount.as_view(),name="deactivate"),
-    path('deactivate_other/',views.DeactivateOthersAccount.as_view(),name="deactivate_other")
+    path('deactivate_other/',views.DeactivateOthersAccount.as_view(),name="deactivate_other"),
+    path('reinstate/',views.ReinstateAccount.as_view(),name="reinstate"),
 ]

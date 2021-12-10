@@ -180,10 +180,11 @@ class DeactivateOthersAccount(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsStaff]
 
+    @swagger_auto_schema(request_body=AccountStatusSerializer,responses={200: "The users account was deactivated"})
     def post(self,request,format=None):
         serializer = AccountStatusSerializer(data=request.data)
 
-        if serializer.is_valid and serializer.validate_instance():
+        if serializer.is_valid() and serializer.validate_instance():
             serializer.deactivate_user()
             data = "The users account was deactivated"
             responseStatus = status.HTTP_200_OK
@@ -201,10 +202,11 @@ class ReinstateAccount(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsStaff]
 
+    @swagger_auto_schema(request_body=AccountStatusSerializer,responses={200: "The user's account was reinstated"})
     def post(self,request,format=None):
         serializer = AccountStatusSerializer(data = request.data)
 
-        if serializer.is_valid and serializer.validate_instance():
+        if serializer.is_valid() and serializer.validate_instance():
             serializer.reinstate_user()
             data = "The user's account was reinstated"
             responseStatus = status.HTTP_200_OK

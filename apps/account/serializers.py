@@ -123,7 +123,7 @@ class AccountStatusSerializer(serializers.Serializer):
     Args:
         serializers ([type]): [description]
     """
-    user = serializers.IntegerField(required=True)
+    user = serializers.CharField(required=True)
 
     def validate_instance(self):
         """This validates if the user instance is valid
