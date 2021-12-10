@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'rest_framework',
     'apps.account',
+    'apps.store',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
 ]
