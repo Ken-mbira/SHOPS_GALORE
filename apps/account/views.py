@@ -158,3 +158,59 @@ class UpdateProfilePic(APIView):
             data = serializer.errors
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
+
+class DeactivateOwnAccount(APIView):
+    """This handles a users request to have their account deactivated
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsOwnerOrReadOnly]
+
+    def put(self,request,format=None):
+        request.user.deactivate_account()
+        data = "Your account was deactivated"
+        return Response(data,status=status.HTTP_200_OK)
+
+class DeactivateOthersAccount(APIView):
+    """This will handle the request to deactivate another users account
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsStaff]
+
+    @swagger_auto_schema(request_body=AccountStatusSerializer,responses={200: "The users account was deactivated"})
+    def post(self,request,format=None):
+        serializer = AccountStatusSerializer(data=request.data)
+
+        if serializer.is_valid() and serializer.validate_instance():
+            serializer.deactivate_user()
+            data = "The users account was deactivated"
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)
+
+
+class ReinstateAccount(APIView):
+    """This will handle the request to deactivate another users account
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsStaff]
+
+    @swagger_auto_schema(request_body=AccountStatusSerializer,responses={200: "The user's account was reinstated"})
+    def post(self,request,format=None):
+        serializer = AccountStatusSerializer(data = request.data)
+
+        if serializer.is_valid() and serializer.validate_instance():
+            serializer.reinstate_user()
+            data = "The user's account was reinstated"
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)
