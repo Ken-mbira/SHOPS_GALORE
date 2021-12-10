@@ -102,6 +102,18 @@ class User(AbstractBaseUser):
         self.is_active = True
         self.save()
 
+    @classmethod
+    def get_active(cls):
+        """This returns all the user with active accounts
+        """
+        return cls.objects.filter(is_active = True)
+
+    @classmethod
+    def get_inactive(cls):
+        """This returns all the users with inactive accounts
+        """
+        return cls.objects.filter(is_active = False)
+
 MALE = "Male"
 FEMALE = "Female"
 RATHER_NOT_SAY = "Rather_Not_Say"
@@ -124,3 +136,6 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to="profiles/")
     gender = models.CharField(max_length=50,choices=gender_choices)
     receive_notifications_via_email = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.user.first_name + "'s profile"
