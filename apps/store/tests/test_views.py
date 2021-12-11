@@ -3,6 +3,7 @@ from rest_framework import status
 from apps.store.tests.test_setup import TestShop
 from apps.store.models import *
 from apps.account.models import *
+from apps.store.serializers import *
 
 class TestShopViews(TestShop):
 
@@ -53,3 +54,21 @@ class TestShopViews(TestShop):
         response = self.client.post(self.create_shop_url,self.shop_detals)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
+    def test_get_shops(self):
+        """This will test if a shop's profile can be updated by a user
+        """
+
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        self.client.post(self.create_shop_url,self.shop_detals)
+
+        response = self.client.get(self.create_shop_url)
+
+        correct_instance = ShopSerializer(Shop.objects.filter(owner = User.objects.get(email = self.login_credentials['email'])),many=True).data
+        self.assertEqual(response.data,correct_instance)
