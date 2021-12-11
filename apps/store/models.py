@@ -46,7 +46,7 @@ class Brand(models.Model):
         models ([type]): [description]
     """
     name = models.CharField(max_length = 50)
-    logo = models.ImageField(upload_to="brand_logos/")
+    logo = models.ImageField(upload_to="brand_logos/",null=True)
 
 class Category(MPTTModel):
     """Inventory category table
