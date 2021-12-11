@@ -20,7 +20,7 @@ class TestShop(APITestCase):
             "first_name":"Marko",
             "last_name":"Awan",
             "email":"awan@gmail.com",
-            "role":3
+            "role":2
         }
 
         self.login_credentials = {

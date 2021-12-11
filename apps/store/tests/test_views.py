@@ -11,7 +11,7 @@ class TestShopViews(TestShop):
         self.client.credentials(HTTP_AUTHORIZATION = f"Token {response.data}")
         return response
 
-    def test_create_shop(self):
+    def test_non_shop_user_create_shop(self):
         """This will test if a user who is not a member of the role store owners can create a shop
         """
         non_shop_owner = {
@@ -37,3 +37,19 @@ class TestShopViews(TestShop):
 
         response = self.client.post(self.create_shop_url,self.shop_detals)
         self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
+
+    def test_create_shop(self):
+        """This will test if a user can create a shop
+        """
+
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        response = self.client.post(self.create_shop_url,self.shop_detals)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
