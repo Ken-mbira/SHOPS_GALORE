@@ -368,3 +368,23 @@ class TestShopViews(TestShop):
         response = self.client.post(reverse('new_product',kwargs={"id":shop.pk}),self.product_details)
 
         self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
+
+    def test_create_stock_table(self):
+        """This checks if the stock table is created for a product once it is created
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        shop = self.client.post(self.create_shop_url,self.shop_details)
+
+        response = self.client.post(reverse('new_product',kwargs={"id":shop.data['id']}),self.product_details)
+
+        stock = Stock.objects.get(product = Product.objects.get(pk = response.data['id']))
+
+        self.assertTrue(stock is not None)
+        self.assertEqual(stock.product,Product.objects.get(pk = response.data['id']))

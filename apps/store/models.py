@@ -144,7 +144,7 @@ class Product(models.Model):
 
     @property
     def active(self):
-        if self.owner.active:
+        if self.owner.active and Media.objects.filter(product = self).count() > 4:
             return True
         return False
 
