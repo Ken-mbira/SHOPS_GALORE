@@ -286,3 +286,21 @@ class TestShopViews(TestShop):
         
         response = self.client.delete(reverse('update',kwargs={"id":10000}))
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)
+
+    def test_full_delete_shop(self):
+        """This will test if a user can delete their own shop
+        """
+
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        created_shop = self.client.post(self.create_shop_url,self.shop_details)
+        
+        response = self.client.delete(reverse('delete',kwargs={"id":created_shop.data['id']}))
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(User.objects.get(email = self.login_credentials['email']).shops.all().count(),0)

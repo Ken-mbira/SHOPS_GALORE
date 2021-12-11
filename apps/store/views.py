@@ -69,7 +69,7 @@ class UpdateShopView(APIView):
 
         return Response(data,responseStatus)
 
-    @swagger_auto_schema(responses={200:"The shop was successfully deleted"})
+    @swagger_auto_schema(responses={200:"The shop was successfully deactivated"})
     def delete(self,request,id):
 
         try:
@@ -80,5 +80,23 @@ class UpdateShopView(APIView):
         shop.deactivate()
         shop.save
 
+        return Response("The shop was successfully deactivated",status.HTTP_200_OK)
+
+    
+class DeleteShopView(APIView):
+    """This adds a full delete option to the shop
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsShopOwner]
+
+    def delete(self,request,id):
+        try:
+            shop = Shop.objects.get(pk = id)
+        except:
+            return Response("The shops was not found",status.HTTP_404_NOT_FOUND)
+
+        shop.delete()
+
         return Response("The shop was deleted successfully",status.HTTP_200_OK)
-            
