@@ -8,15 +8,13 @@ class IsShopOwner(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        # print(dir(view))
-        # print(view.kwargs)
         try:
             shop = Shop.objects.get(pk = view.kwargs['id'])
             if shop.owner == request.user:
                 return True
             return False
         except:
-            pass
+            return True
         
 class ShopPermissions(permissions.BasePermission):
     """This handles the permissions for handling a shop instance
