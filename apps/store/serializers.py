@@ -1,3 +1,4 @@
+from django.db.models.fields import IntegerField
 from rest_framework import serializers
 
 from apps.store.models import *
@@ -49,3 +50,42 @@ class UpdateShopSerializer(serializers.Serializer):
             return True
         except:
             raise serializers.ValidationError("The object was not found")
+
+class AttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        fields = '__all__'
+    
+class CreateProductSerializers(serializers.ModelSerializer):
+    """This handles the creation of a new product
+
+    Args:
+        serializers ([type]): [description]
+    """
+    attributes = serializers.ListField()
+    class Meta:
+        model = Product
+        fields = ['name','brand','category','type','description','price','attributes']
+
+    def save(self,shop):
+        product = Product(
+            name = self.validated_data['name'],
+            owner = shop,
+            brand = self.validated_data['brand'],
+            category = self.validated_data['category'],
+            type = self.validated_data['type'],
+            description = self.validated_data['description'],
+            price = self.validated_data['price']
+        )
+        product.save()
+        for value in self.validated_data['attributes']:
+            attribute_value = AttributeValue.objects.get(pk = int(value))
+            product.attribute_value.add(attribute_value)
+            product.save()
+
+        return product
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
