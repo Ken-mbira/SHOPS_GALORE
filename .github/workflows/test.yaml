@@ -34,25 +34,12 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Cache dependencies
-        id: Cachingstep
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-requirements
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
       - name: Download dependencies
-        if: steps.Cachingstep.outputs.cache-hit != 'true'
         run: |
           pip install -r requirements.txt
       - name: test secrets
         run: |
+          echo "hello ${{ env.SECRET_KEY }}"
           echo "hello ${{ env.SECRET_KEY }}"
       - name: Run Tests
         run: |
