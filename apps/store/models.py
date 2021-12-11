@@ -21,6 +21,7 @@ class Shop(models.Model):
     phone_contact = PhoneNumberField(region="KE")
     email_contact = models.EmailField()
     subscription_end_date = models.DateField(null=True)
+    functional = models.BooleanField(default=True)
 
 
     def __str__(self):
@@ -28,9 +29,13 @@ class Shop(models.Model):
 
     @property
     def active(self):
-        if (self.subscription_end_date.isnull == True) or datetime(self.subscription_end_date) < datetime.now() or (self.owner.is_active == False):
+        if (self.subscription_end_date is None) or datetime(self.subscription_end_date) < datetime.now() or (self.owner.is_active == False) or self.functional == False:
             return False
         return True
+
+    def deactivate(self):
+        self.functional = False
+        self.save()
 
 
 
