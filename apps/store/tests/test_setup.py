@@ -48,6 +48,18 @@ class TestShop(APITestCase):
             "phone_contact": "+254722442604",
             "email_contact": "mbira@ken.com"
         }
+
+        self.product_details = {
+            "name": "Mens Leather Jacket",
+            "brand": 1,
+            "category": 1,
+            "type": 1,
+            "description": "A leather jacket for men",
+            "price": "12.50",
+            "attributes": [
+                "1","2"
+            ]
+        }
         return super().setUp()
 
     def tearDown(self):

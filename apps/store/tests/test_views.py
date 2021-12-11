@@ -304,3 +304,24 @@ class TestShopViews(TestShop):
         response = self.client.delete(reverse('delete',kwargs={"id":created_shop.data['id']}))
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         self.assertEqual(User.objects.get(email = self.login_credentials['email']).shops.all().count(),0)
+
+    def test_create_product(self):
+        """This will test if a product can be created for the first time
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        shop = self.client.post(self.create_shop_url,self.shop_details)
+
+        self.assertEqual(Product.objects.all().count(),0)
+
+        response = self.client.post(reverse('new_product',kwargs={"id":shop.data['id']}),self.product_details)
+
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
+        self.assertEqual(Product.objects.all().count(),1)
