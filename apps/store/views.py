@@ -3,6 +3,7 @@ from django.shortcuts import render
 
 from rest_framework import permissions
 from rest_framework import response
+from rest_framework.test import APITestCase
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -121,3 +122,32 @@ class CreateProductView(APIView):
             responseStatus = status.HTTP_400_BAD_REQUEST
 
         return Response(data,responseStatus)
+
+class BrandView(APIView):
+    """This handles the view of brands
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(responses={200: BrandSerializer()})
+    def get(self,request,format=None):
+        brands = Brand.objects.all()
+        data = BrandSerializer(brands,many=True).data
+        return Response(data,status.HTTP_200_OK)
+
+class TypeView(APIView):
+    """This handles the view of types
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(responses={200: TypeSerializer()})
+    def get(self,request,format=None):
+        brands = Type.objects.all()
+        data = TypeSerializer(brands,many=True).data
+        return Response(data,status.HTTP_200_OK)
+        
