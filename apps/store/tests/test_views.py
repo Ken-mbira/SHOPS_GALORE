@@ -37,7 +37,7 @@ class TestShopViews(TestShop):
 
         self.authenticate(new_login_credentials)
 
-        response = self.client.post(self.create_shop_url,self.shop_detals)
+        response = self.client.post(self.create_shop_url,self.shop_details)
         self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
 
     def test_create_shop(self):
@@ -52,7 +52,7 @@ class TestShopViews(TestShop):
 
         self.authenticate(self.login_credentials)
 
-        response = self.client.post(self.create_shop_url,self.shop_detals)
+        response = self.client.post(self.create_shop_url,self.shop_details)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
     def test_get_shops(self):
@@ -67,7 +67,7 @@ class TestShopViews(TestShop):
 
         self.authenticate(self.login_credentials)
 
-        self.client.post(self.create_shop_url,self.shop_detals)
+        self.client.post(self.create_shop_url,self.shop_details)
 
         response = self.client.get(self.create_shop_url)
 
@@ -85,7 +85,7 @@ class TestShopViews(TestShop):
 
         self.authenticate(self.login_credentials)
 
-        created_shop = self.client.post(self.create_shop_url,self.shop_detals)
+        created_shop = self.client.post(self.create_shop_url,self.shop_details)
 
         new_shop_profile = {
             "name": "Maendeleo developers",
@@ -98,3 +98,54 @@ class TestShopViews(TestShop):
         response = self.client.put(reverse('update',kwargs={"id":created_shop.data['id']}),new_shop_profile)
 
         self.assertEqual(response.status_code,status.HTTP_200_OK)
+
+    def test_update_others_shop(self):
+        """This test checks if a user can update a shop that's not his'hers
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        shop = Shop(
+            name = self.shop_details['name'],
+            bio = self.shop_details['bio'],
+            owner = User.objects.get(email = self.login_credentials['email']),
+            pickup_location = self.shop_details['pickup_location'],
+            email_contact = self.shop_details['email_contact'],
+        )
+        shop.save()
+
+        other_user_credentials = {
+            "password":"1234",
+            "first_name":"Musa",
+            "last_name":"Mosomi",
+            "email":"mosomi@gmail.com",
+            "role":2
+        }
+
+        other_user_login_credentials = {
+            "email":other_user_credentials['email'],
+            "password":other_user_credentials['password']
+        }
+
+        self.client.post(self.register_url,other_user_credentials)
+
+        user = User.objects.get(email = other_user_login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(other_user_login_credentials)
+
+        new_shop_profile = {
+            "name": "Maendeleo developers",
+            "bio": "A new company slogan",
+            "pickup_location": "string",
+            "phone_contact": "+254722442604",
+            "email_contact": "mbira@ken.com"
+        }
+
+        response = self.client.put(reverse('update',kwargs={"id":shop.pk}),new_shop_profile)
+
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)

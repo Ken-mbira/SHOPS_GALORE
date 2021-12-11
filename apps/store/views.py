@@ -46,7 +46,7 @@ class UpdateShopView(APIView):
     Args:
         APIView ([type]): [description]
     """
-    permission_classes = [permissions.IsAuthenticated & IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated & IsShopOwner]
 
     @swagger_auto_schema(request_body=ShopSerializer,responses={200:ShopSerializer})
     def put(self,request,id):

@@ -28,7 +28,7 @@ class TestShop(APITestCase):
             "password":"1234"
         }
 
-        self.shop_detals = {
+        self.shop_details = {
             "name": "Jitihada developers",
             "bio": "string",
             "pickup_location": "string",
