@@ -33,8 +33,7 @@ class TestShop(APITestCase):
             "bio": "string",
             "pickup_location": "string",
             "phone_contact": "+254722442604",
-            "email_contact": "mbira@ken.com",
-            "functional": True,
+            "email_contact": "mbira@ken.com"
         }
         return super().setUp()
 

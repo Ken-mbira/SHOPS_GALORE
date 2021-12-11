@@ -54,7 +54,6 @@ class UpdateShopView(APIView):
 
         try:
             instance = Shop.objects.get(pk = id)
-            print(instance)
         
         except:
             return Response("The shop was not found",status.HTTP_404_NOT_FOUND)

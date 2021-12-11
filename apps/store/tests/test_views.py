@@ -1,4 +1,5 @@
 from rest_framework import status
+from django.urls import reverse
 
 from apps.store.tests.test_setup import TestShop
 from apps.store.models import *
@@ -72,3 +73,28 @@ class TestShopViews(TestShop):
 
         correct_instance = ShopSerializer(Shop.objects.filter(owner = User.objects.get(email = self.login_credentials['email'])),many=True).data
         self.assertEqual(response.data,correct_instance)
+
+    def test_update_shop(self):
+        """This will test if the shop's owner can update the shop profile
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        created_shop = self.client.post(self.create_shop_url,self.shop_detals)
+
+        new_shop_profile = {
+            "name": "Maendeleo developers",
+            "bio": "A new company slogan",
+            "pickup_location": "string",
+            "phone_contact": "+254722442604",
+            "email_contact": "mbira@ken.com"
+        }
+
+        response = self.client.put(reverse('update',kwargs={"id":created_shop.data['id']}),new_shop_profile)
+
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
