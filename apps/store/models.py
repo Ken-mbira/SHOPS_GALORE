@@ -119,13 +119,16 @@ class AttributeValue(models.Model):
     attribute = models.ForeignKey(Attribute,on_delete=models.PROTECT,related_name="attribute_values")
     description = models.TextField(null=True)
 
+    def __str__(self):
+        return self.attribute.name + " - " + self.value
+
 class Product(models.Model):
     """This defines the commodity and all the fields involved
 
     Args:
         models ([type]): [description]
     """
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100,unique=True)
     brand = models.ForeignKey(Brand,on_delete=models.PROTECT,related_name="product")
     category = models.ForeignKey(Category,on_delete=models.PROTECT,related_name="product")
     type = models.ForeignKey(Type,on_delete=models.SET_NULL,related_name="product",null=True)
