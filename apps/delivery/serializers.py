@@ -27,3 +27,15 @@ class RegisterMeansSerializer(serializers.ModelSerializer):
 
         mean.save()
         return mean
+
+class DeliveryMeansImage(serializers.Serializer):
+    """This adds a way to update the image for a means
+
+    Args:
+        serializers ([type]): [description]
+    """
+    image = serializers.ImageField(required=True)
+
+    def save(self,means):
+        means.image = self.validated_data['image']
+        means.save()

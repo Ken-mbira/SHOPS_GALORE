@@ -38,4 +38,23 @@ class DeliveryMeansView(APIView):
         data = RegisterMeansSerializer(means,many=True).data
         
         return Response(data,status.HTTP_200_OK)
-        
+
+class UpdateMeans(APIView):
+    """This handles updating a single means
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsMeansOwner]
+
+    def post(self,request,id):
+        means = DeliveryMeans.objects.get(pk = id)
+        serializer = DeliveryMeansImage(data=request.data)
+        if serializer.is_valid():
+            serializer.save(means)
+            data = "The image was successfully updated"
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)
