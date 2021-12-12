@@ -90,6 +90,18 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+class GetShopSerializer(serializers.ModelSerializer):
+    """This handles the response for getting all details about a shop
+
+    Args:
+        serializers ([type]): [description]
+    """
+    product = ProductSerializer(many=True)
+    active = serializers.ReadOnlyField()
+    class Meta:
+        model = Shop
+        fields = ['name','bio','created_on','owner','logo','pickup_location','phone_contact','email_contact','subscription_end_date','functional','active','product']
+
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand

@@ -123,6 +123,16 @@ class CreateProductView(APIView):
 
         return Response(data,responseStatus)
 
+    @swagger_auto_schema(responses={200:GetShopSerializer()})
+    def get(self,request,id):
+        try:
+            shop = Shop.objects.get(pk = id)
+        except:
+            return Response("The shop was not found")
+
+        data = GetShopSerializer(shop).data
+        return Response(data,status.HTTP_200_OK)
+
 class BrandView(APIView):
     """This handles the view of brands
 
