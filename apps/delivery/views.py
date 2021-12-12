@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import response
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -101,3 +102,10 @@ class DestinationView(APIView):
             responseStatus = status.HTTP_400_BAD_REQUEST
 
         return Response(data,responseStatus)
+
+    @swagger_auto_schema(responses={200:"The destination was deleted"})
+    def delete(self,request,id):
+        destination = Destination.objects.get(pk = id)
+        destination.delete()
+        data = "The destination was deleted"
+        return Response(data,status.HTTP_200_OK)
