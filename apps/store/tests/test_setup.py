@@ -8,6 +8,7 @@ class TestShop(APITestCase):
     def setUp(self):
         self.register_url = reverse('create_user')
         self.login_url = reverse('login')
+        self.auth_url = reverse('token_obtain_pair')
         self.create_shop_url = reverse('new_shop')
 
         if len(Role.objects.all()) < 4:
