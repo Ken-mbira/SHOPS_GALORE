@@ -123,6 +123,16 @@ class CreateProductView(APIView):
 
         return Response(data,responseStatus)
 
+    @swagger_auto_schema(responses={200:GetShopSerializer()})
+    def get(self,request,id):
+        try:
+            shop = Shop.objects.get(pk = id)
+        except:
+            return Response("The shop was not found")
+
+        data = GetShopSerializer(shop).data
+        return Response(data,status.HTTP_200_OK)
+
 class BrandView(APIView):
     """This handles the view of brands
 
@@ -151,3 +161,73 @@ class TypeView(APIView):
         data = TypeSerializer(brands,many=True).data
         return Response(data,status.HTTP_200_OK)
         
+
+class SingleProductView(APIView):
+    """This handles the request for a specific product
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsProductOwner]
+
+    @swagger_auto_schema(responses={200: GetProductSerializer()})
+    def get(self,request,id):
+        product = Product.objects.get(pk = id)
+        data = GetProductSerializer(product).data
+        return Response(data,status.HTTP_200_OK)
+
+    @swagger_auto_schema(request_body=ProductImagesSerializer,responses={200: ProductImagesSerializer()})
+    def post(self,request,id):
+        """This creates a new image for the product
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        product = Product.objects.get(pk = id)
+        serializer = ProductImagesSerializer(data = request.data)
+        if serializer.is_valid():
+            data = ProductImagesSerializer(serializer.save(product)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)
+
+    @swagger_auto_schema(request_body=CreateProductSerializers,responses={200: ProductSerializer()})
+    def put(self,request,id):
+        product = Product.objects.get(pk = id)
+        serializer = CreateProductSerializers(data = request.data)
+        if serializer.is_valid():
+            data = ProductSerializer(serializer.update(product)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)
+
+class StockView(APIView):
+    """This handles a products stock
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsProductOwner]
+
+    @swagger_auto_schema(request_body=StockSerializer,responses={200: ProductSerializer()})
+    def put(self,request,id):
+        product = Product.objects.get(pk = id)
+        serializer = StockSerializer(data = request.data)
+        if serializer.is_valid():
+            data = ProductSerializer(serializer.update(product.stock)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+            
+
