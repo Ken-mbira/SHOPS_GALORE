@@ -209,3 +209,25 @@ class SingleProductView(APIView):
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
 
+class StockView(APIView):
+    """This handles a products stock
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsProductOwner]
+
+    @swagger_auto_schema(request_body=StockSerializer,responses={200: ProductSerializer()})
+    def put(self,request,id):
+        product = Product.objects.get(pk = id)
+        serializer = StockSerializer(data = request.data)
+        if serializer.is_valid():
+            data = ProductSerializer(serializer.update(product.stock)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+            
+

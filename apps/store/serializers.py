@@ -107,6 +107,13 @@ class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
         fields = '__all__'
+        read_only_fields = ['product']
+
+    def update(self,instance):
+        instance.count = self.validated_data['count']
+        instance.last_stock_check_date = self.validated_data['last_stock_check_date']
+        instance.save()
+        return instance.product
 
 class GetShopSerializer(serializers.ModelSerializer):
     """This handles the response for getting all details about a shop
