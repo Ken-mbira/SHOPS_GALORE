@@ -47,6 +47,7 @@ class UpdateMeans(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsMeansOwner]
 
+    @swagger_auto_schema(request_body=DeliveryMeansImage,responses=DeliveryMeansImage())
     def post(self,request,id):
         means = DeliveryMeans.objects.get(pk = id)
         serializer = DeliveryMeansImage(data=request.data)
@@ -58,3 +59,10 @@ class UpdateMeans(APIView):
             data = serializer.errors
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
+
+    @swagger_auto_schema(responses={200:"The image was successfully deleted"})
+    def delete(self,request,id):
+        means = DeliveryMeans.objects.get(pk=id)
+        means.delete()
+        data = "The image was successfully deleted"
+        return Response(data,status.HTTP_200_OK)
