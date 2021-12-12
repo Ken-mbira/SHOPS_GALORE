@@ -82,6 +82,17 @@ class CreateProductSerializers(serializers.ModelSerializer):
 
         return product
 
+    def update(self,instance):
+        instance.name = self.validated_data['name']
+        instance.brand = self.validated_data['brand']
+        instance.category = self.validated_data['category']
+        instance.type = self.validated_data['type']
+        instance.description = self.validated_data['description']
+        instance.price = self.validated_data['price']
+
+        instance.save()
+        return instance
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product

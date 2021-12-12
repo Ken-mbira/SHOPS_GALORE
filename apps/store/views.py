@@ -178,6 +178,15 @@ class SingleProductView(APIView):
 
     @swagger_auto_schema(request_body=ProductImagesSerializer,responses={200: ProductImagesSerializer()})
     def post(self,request,id):
+        """This creates a new image for the product
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         product = Product.objects.get(pk = id)
         serializer = ProductImagesSerializer(data = request.data)
         if serializer.is_valid():
@@ -187,3 +196,16 @@ class SingleProductView(APIView):
             data = serializer.errors
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
+
+    @swagger_auto_schema(request_body=CreateProductSerializers,responses={200: ProductSerializer()})
+    def put(self,request,id):
+        product = Product.objects.get(pk = id)
+        serializer = CreateProductSerializers(data = request.data)
+        if serializer.is_valid():
+            data = ProductSerializer(serializer.update(product)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)
+
