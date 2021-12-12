@@ -128,7 +128,7 @@ class Product(models.Model):
     Args:
         models ([type]): [description]
     """
-    name = models.CharField(max_length=100,unique=True)
+    name = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand,on_delete=models.PROTECT,related_name="product")
     category = models.ForeignKey(Category,on_delete=models.PROTECT,related_name="product")
     type = models.ForeignKey(Type,on_delete=models.SET_NULL,related_name="product",null=True)
@@ -144,7 +144,7 @@ class Product(models.Model):
 
     @property
     def active(self):
-        if self.owner.active:
+        if self.owner.active and Media.objects.filter(product = self).count() > 4:
             return True
         return False
 
