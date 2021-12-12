@@ -27,6 +27,8 @@ class TestShop(APITestCase):
         self.large_attribute = AttributeValue.objects.create(value="large",attribute = self.product_attribute,description = "The biggest of the sizes")
         self.middle_attribute = AttributeValue.objects.create(value="middle",attribute = self.product_attribute,description = "The middle of the sizes")
         self.small_attribute = AttributeValue.objects.create(value="small",attribute = self.product_attribute,description = "The least of the sizes")
+        self.parent_location = Location.objects.create(name="Kajiado")
+        self.location = Location.objects.create(name="Kiserian",parent = self.parent_location)
 
 
         self.user_data = {
@@ -45,7 +47,7 @@ class TestShop(APITestCase):
         self.shop_details = {
             "name": "Jitihada developers",
             "bio": "string",
-            "pickup_location": "string",
+            "pickup_location": 1,
             "phone_contact": "+254722442604",
             "email_contact": "mbira@ken.com"
         }
