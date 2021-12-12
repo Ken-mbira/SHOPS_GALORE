@@ -147,6 +147,12 @@ class AttributeValueSerializer(serializers.ModelSerializer):
         model = AttributeValue
         fields = '__all__'
 
+class AttributeSerializer(serializers.ModelSerializer):
+    attribute_values = AttributeValueSerializer(many=True)
+    class Meta:
+        model = Attribute
+        fields = ['name','description','type','attribute_values']
+
 class ProductImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media

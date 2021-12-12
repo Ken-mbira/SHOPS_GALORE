@@ -251,6 +251,19 @@ class UpdateDefaultImage(APIView):
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
 
+class AttributeFilterView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self,request,id):
+        try:
+            type = Type.objects.get(pk = id)
+        except :
+            return Response("The type was not found",status.HTTP_404_NOT_FOUND)
+        
+        attributes = Attribute.objects.filter(type = type)
+
+        data = AttributeSerializer(attributes,many=True).data
+        return Response(data,status.HTTP_200_OK)
 
             
 
