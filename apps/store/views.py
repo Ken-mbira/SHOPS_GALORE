@@ -176,6 +176,7 @@ class SingleProductView(APIView):
         data = GetProductSerializer(product).data
         return Response(data,status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=ProductImagesSerializer,responses={200: ProductImagesSerializer()})
     def post(self,request,id):
         product = Product.objects.get(pk = id)
         serializer = ProductImagesSerializer(data = request.data)
