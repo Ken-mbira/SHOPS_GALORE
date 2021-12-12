@@ -47,8 +47,21 @@ class UpdateMeans(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsMeansOwner]
 
-    @swagger_auto_schema(request_body=DeliveryMeansImage,responses=DeliveryMeansImage())
+    @swagger_auto_schema(request_body=DestinationSerializer,responses={200:DestinationSerializer()})
     def post(self,request,id):
+        means = DeliveryMeans.objects.get(pk = id)
+        serializer = DestinationSerializer(data=request.data)
+        if serializer.is_valid():
+            data = DestinationSerializer(serializer.save(means)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+    @swagger_auto_schema(request_body=DeliveryMeansImage,responses={200:DeliveryMeansImage()})
+    def put(self,request,id):
         means = DeliveryMeans.objects.get(pk = id)
         serializer = DeliveryMeansImage(data=request.data)
         if serializer.is_valid():
