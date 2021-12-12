@@ -1,3 +1,4 @@
+from django.db.models import fields
 from django.db.models.fields import IntegerField
 from rest_framework import serializers
 
@@ -50,11 +51,6 @@ class UpdateShopSerializer(serializers.Serializer):
             return True
         except:
             raise serializers.ValidationError("The object was not found")
-
-class AttributeValueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AttributeValue
-        fields = '__all__'
     
 class CreateProductSerializers(serializers.ModelSerializer):
     """This handles the creation of a new product
@@ -90,6 +86,16 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+class StockSerializer(serializers.ModelSerializer):
+    """This handles the stocks for a single product
+
+    Args:
+        serializers ([type]): [description]
+    """
+    class Meta:
+        model = Stock
+        fields = '__all__'
+
 class GetShopSerializer(serializers.ModelSerializer):
     """This handles the response for getting all details about a shop
 
@@ -111,3 +117,40 @@ class TypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Type
         fields = '__all__'
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+class AttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        fields = '__all__'
+
+class GetProductSerializer(serializers.ModelSerializer):
+    """This handles the response for a single product being viewed
+
+    Args:
+        serializers ([type]): [description]
+    """
+    owner = ShopSerializer()
+    stock = StockSerializer()
+    brand = BrandSerializer()
+    category = CategorySerializer()
+    attribute_value = AttributeValueSerializer(many=True)
+    class Meta:
+        model = Product
+        fields = [
+            'name',
+            'brand',
+            'category',
+            'type',
+            'added_on',
+            'owner',
+            'attribute_value',
+            'description',
+            'price',
+            'discount_price',
+            'stock'
+        ]

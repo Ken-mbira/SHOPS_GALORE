@@ -161,3 +161,16 @@ class TypeView(APIView):
         data = TypeSerializer(brands,many=True).data
         return Response(data,status.HTTP_200_OK)
         
+
+class SingleProductView(APIView):
+    """This handles the request for a specific product
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsProductOwner]
+
+    def get(self,request,id):
+        product = Product.objects.get(pk = id)
+        data = GetProductSerializer(product).data
+        return Response(data,status.HTTP_200_OK)
