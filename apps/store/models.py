@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from mptt.models import MPTTModel, TreeForeignKey
 
 from apps.account.models import User
+from apps.delivery.models import *
 
 class Shop(models.Model):
     """This defines involved in making a store
@@ -17,7 +18,7 @@ class Shop(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,editable=False)
     owner = models.ForeignKey(User,on_delete=models.PROTECT,related_name="shops")
     logo = models.ImageField(upload_to="store_profiles/",null=True)
-    pickup_location = models.CharField(max_length=50)
+    pickup_location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="shop")
     phone_contact = PhoneNumberField(region="KE")
     email_contact = models.EmailField()
     subscription_end_date = models.DateField(null=True)
