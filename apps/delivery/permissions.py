@@ -30,6 +30,21 @@ class IsMeansOwner(permissions.BasePermission):
         except:
             raise NotFound()
 
+class IsDestinationMeansOwner(permissions.BasePermission):
+    """this checks if a user can update set destination for a registered means
+
+    Args:
+        permissions ([type]): [description]
+    """
+    def has_permission(self, request, view):
+        try:
+            destination = Destination.objects.get(pk = view.kwargs['id'])
+            if destination.means.owner == request.user:
+                return True
+            return False
+        except:
+            raise NotFound()
+
 class NotFound(APIException):
     status_code = status.HTTP_404_NOT_FOUND
     default_detail = {"error":True,"message":"What you are looking for was not found"}

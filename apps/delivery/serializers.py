@@ -59,3 +59,16 @@ class DestinationSerializer(serializers.ModelSerializer):
         )
         destination.save()
         return destination
+
+class DestinationPriceSerializer(serializers.Serializer):
+    """This handles updating a destination's price
+
+    Args:
+        serializers ([type]): [description]
+    """
+    price = serializers.DecimalField(max_digits=10,decimal_places=2)
+
+    def save(self,destination):
+        destination.price = self.validated_data['price']
+        destination.save()
+        return destination
