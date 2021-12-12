@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.db.models import fields
 from django.db.models.fields import IntegerField
 from rest_framework import serializers
 
@@ -50,11 +52,6 @@ class UpdateShopSerializer(serializers.Serializer):
             return True
         except:
             raise serializers.ValidationError("The object was not found")
-
-class AttributeValueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AttributeValue
-        fields = '__all__'
     
 class CreateProductSerializers(serializers.ModelSerializer):
     """This handles the creation of a new product
@@ -85,10 +82,50 @@ class CreateProductSerializers(serializers.ModelSerializer):
 
         return product
 
+    def update(self,instance):
+        instance.name = self.validated_data['name']
+        instance.brand = self.validated_data['brand']
+        instance.category = self.validated_data['category']
+        instance.type = self.validated_data['type']
+        instance.description = self.validated_data['description']
+        instance.price = self.validated_data['price']
+
+        instance.save()
+        return instance
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+class StockSerializer(serializers.ModelSerializer):
+    """This handles the stocks for a single product
+
+    Args:
+        serializers ([type]): [description]
+    """
+    class Meta:
+        model = Stock
+        fields = '__all__'
+        read_only_fields = ['product']
+
+    def update(self,instance):
+        instance.count = self.validated_data['count']
+        instance.last_stock_check_date = self.validated_data['last_stock_check_date']
+        instance.save()
+        return instance.product
+
+class GetShopSerializer(serializers.ModelSerializer):
+    """This handles the response for getting all details about a shop
+
+    Args:
+        serializers ([type]): [description]
+    """
+    product = ProductSerializer(many=True)
+    active = serializers.ReadOnlyField()
+    class Meta:
+        model = Shop
+        fields = ['name','bio','created_on','owner','logo','pickup_location','phone_contact','email_contact','subscription_end_date','functional','active','product']
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
@@ -99,3 +136,56 @@ class TypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Type
         fields = '__all__'
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+class AttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        fields = '__all__'
+
+class ProductImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = '__all__'
+        read_only_fields = ['product','is_default']
+
+    def save(self,product):
+        try:
+            image = Media(product = product,image = self.validated_data['image'])
+            image.save()
+            return image
+        except Exception as e:
+            raise ValidationError("There was a problem updating your product image")
+
+class GetProductSerializer(serializers.ModelSerializer):
+    """This handles the response for a single product being viewed
+
+    Args:
+        serializers ([type]): [description]
+    """
+    product_images = ProductImagesSerializer(many=True)
+    owner = ShopSerializer()
+    stock = StockSerializer()
+    brand = BrandSerializer()
+    category = CategorySerializer()
+    attribute_value = AttributeValueSerializer(many=True)
+    class Meta:
+        model = Product
+        fields = [
+            'name',
+            'brand',
+            'category',
+            'type',
+            'added_on',
+            'owner',
+            'attribute_value',
+            'description',
+            'price',
+            'discount_price',
+            'stock',
+            'product_images'
+        ]
