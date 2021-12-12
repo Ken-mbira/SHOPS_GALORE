@@ -128,12 +128,18 @@ class AttributeValueSerializer(serializers.ModelSerializer):
         model = AttributeValue
         fields = '__all__'
 
+class ProductImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = '__all__'
+
 class GetProductSerializer(serializers.ModelSerializer):
     """This handles the response for a single product being viewed
 
     Args:
         serializers ([type]): [description]
     """
+    product_images = ProductImagesSerializer(many=True)
     owner = ShopSerializer()
     stock = StockSerializer()
     brand = BrandSerializer()
@@ -152,5 +158,6 @@ class GetProductSerializer(serializers.ModelSerializer):
             'description',
             'price',
             'discount_price',
-            'stock'
+            'stock',
+            'product_images'
         ]
