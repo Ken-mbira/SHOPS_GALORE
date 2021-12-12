@@ -170,7 +170,19 @@ class SingleProductView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsProductOwner]
 
+    @swagger_auto_schema(responses={200: GetProductSerializer()})
     def get(self,request,id):
         product = Product.objects.get(pk = id)
         data = GetProductSerializer(product).data
         return Response(data,status.HTTP_200_OK)
+
+    def post(self,request,id):
+        product = Product.objects.get(pk = id)
+        serializer = ProductImagesSerializer(data = request.data)
+        if serializer.is_valid():
+            data = ProductImagesSerializer(serializer.save(product)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db.models import fields
 from django.db.models.fields import IntegerField
 from rest_framework import serializers
@@ -132,6 +133,15 @@ class ProductImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
         fields = '__all__'
+        read_only_fields = ['product','is_default']
+
+    def save(self,product):
+        try:
+            image = Media(product = product,image = self.validated_data['image'])
+            image.save()
+            return image
+        except Exception as e:
+            raise ValidationError("There was a problem updating your product image")
 
 class GetProductSerializer(serializers.ModelSerializer):
     """This handles the response for a single product being viewed
