@@ -9,9 +9,11 @@ from apps.store.serializers import *
 class TestShopViews(TestShop):
 
     def authenticate(self,user_data):
-        response = self.client.post(self.login_url,user_data)
-        self.client.credentials(HTTP_AUTHORIZATION = f"Token {response.data}")
-        return response
+        response = self.client.post(self.auth_url,user_data)
+        try:
+            self.client.credentials(HTTP_AUTHORIZATION = f"Bearer {response.data['access']}")
+        except :
+            return response
 
     def test_non_shop_user_create_shop(self):
         """This will test if a user who is not a member of the role store owners can create a shop

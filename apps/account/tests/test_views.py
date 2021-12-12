@@ -22,9 +22,9 @@ class TestViews(TestSetUp):
         """This tests whether a user can login while not activated account
         """
         self.client.post(self.register_url,self.user_data)
-        res = self.client.post(self.login_url,self.login_credentials)
+        res = self.client.post(self.auth_url,self.login_credentials)
 
-        self.assertEqual(res.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code,status.HTTP_401_UNAUTHORIZED)
 
     def test_user_activation(self):
         """This will test whether a user receives an account activation email
@@ -40,9 +40,9 @@ class TestViews(TestSetUp):
             "password":"wrong"
         }
         self.client.post(self.register_url,self.user_data)
-        res = self.client.post(self.login_url,wrong_credentials)
+        res = self.client.post(self.auth_url,wrong_credentials)
 
-        self.assertEqual(res.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.status_code,status.HTTP_401_UNAUTHORIZED)
 
     def test_get_user_instance(self):
         """This tests whether the get user instance endpoint returns a user instance
@@ -60,9 +60,11 @@ class TestViews(TestSetUp):
         self.assertEqual(correct_instance,instance.data)  
 
     def authenticate(self,user_data):
-        response = self.client.post(self.login_url,user_data)
-        self.client.credentials(HTTP_AUTHORIZATION = f"Token {response.data}")
-        return response
+        response = self.client.post(self.auth_url,user_data)
+        try:
+            self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.data['access']}")
+        except:
+            return response
 
     def test_update_profile(self):
         """This test whether a user can update their own profile
