@@ -229,5 +229,28 @@ class StockView(APIView):
             responseStatus = status.HTTP_400_BAD_REQUEST
 
         return Response(data,responseStatus)
+
+class UpdateDefaultImage(APIView):
+    """This handles changing the default image for a product
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsProductOwner]
+
+    @swagger_auto_schema(request_body=DefaultImageSerializer,responses={200: GetProductSerializer()})
+    def post(self,request,id):
+        product = Product.objects.get(pk = id)
+
+        serializer = DefaultImageSerializer(data=request.data)
+        if serializer.is_valid():
+            data = GetProductSerializer(serializer.make_featured(product)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)
+
+
             
 

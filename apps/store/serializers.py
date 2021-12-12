@@ -161,6 +161,16 @@ class ProductImagesSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise ValidationError("There was a problem updating your product image")
 
+    def make_featured(self,product,image):
+        currently_featured = Media.objects.filter(product = product,is_default = True)
+        if currently_featured is not None:
+            for current in currently_featured:
+                current.is_default = False
+                current.save()
+        image.is_featured = True
+        image.save()
+        return product
+
 class GetProductSerializer(serializers.ModelSerializer):
     """This handles the response for a single product being viewed
 
@@ -189,3 +199,22 @@ class GetProductSerializer(serializers.ModelSerializer):
             'stock',
             'product_images'
         ]
+
+class DefaultImageSerializer(serializers.Serializer):
+    image = serializers.CharField(required=True)
+
+    def make_featured(self,product):
+        try:
+            image = Media.objects.get(pk = int(self.validated_data['image']))
+        except:
+            raise ValidationError("The image was not found")
+
+        currently_featured = Media.objects.filter(product = product,is_default = True)
+        if currently_featured is not None:
+            for current in currently_featured.iterator():
+                current.is_default = False
+                current.save()
+                
+        image.is_default = True
+        image.save()
+        return image.product    
