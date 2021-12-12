@@ -92,7 +92,7 @@ class TestShopViews(TestShop):
         new_shop_profile = {
             "name": "Maendeleo developers",
             "bio": "A new company slogan",
-            "pickup_location": "string",
+            "pickup_location": 1,
             "phone_contact": "+254722442604",
             "email_contact": "mbira@ken.com"
         }
@@ -114,7 +114,7 @@ class TestShopViews(TestShop):
             name = self.shop_details['name'],
             bio = self.shop_details['bio'],
             owner = User.objects.get(email = self.login_credentials['email']),
-            pickup_location = self.shop_details['pickup_location'],
+            pickup_location = Location.objects.get(pk = self.shop_details['pickup_location']),
             email_contact = self.shop_details['email_contact'],
         )
         shop.save()
@@ -143,7 +143,7 @@ class TestShopViews(TestShop):
         new_shop_profile = {
             "name": "Maendeleo developers",
             "bio": "A new company slogan",
-            "pickup_location": "string",
+            "pickup_location": 1,
             "phone_contact": "+254722442604",
             "email_contact": "mbira@ken.com"
         }
@@ -165,7 +165,7 @@ class TestShopViews(TestShop):
             name = self.shop_details['name'],
             bio = self.shop_details['bio'],
             owner = User.objects.get(email = self.login_credentials['email']),
-            pickup_location = self.shop_details['pickup_location'],
+            pickup_location = Location.objects.get(pk = self.shop_details['pickup_location']),
             email_contact = self.shop_details['email_contact'],
         )
         shop.save()
@@ -194,7 +194,7 @@ class TestShopViews(TestShop):
         new_shop_profile = {
             "name": "Maendeleo developers",
             "bio": "A new company slogan",
-            "pickup_location": "string",
+            "pickup_location": 1,
             "phone_contact": "+254722442604",
             "email_contact": "mbira@ken.com"
         }
@@ -234,7 +234,7 @@ class TestShopViews(TestShop):
             name = self.shop_details['name'],
             bio = self.shop_details['bio'],
             owner = User.objects.get(email = self.login_credentials['email']),
-            pickup_location = self.shop_details['pickup_location'],
+            pickup_location = Location.objects.get(pk = self.shop_details['pickup_location']),
             email_contact = self.shop_details['email_contact'],
         )
         shop.save()
@@ -263,7 +263,7 @@ class TestShopViews(TestShop):
         new_shop_profile = {
             "name": "Maendeleo developers",
             "bio": "A new company slogan",
-            "pickup_location": "string",
+            "pickup_location": 1,
             "phone_contact": "+254722442604",
             "email_contact": "mbira@ken.com"
         }
@@ -341,7 +341,7 @@ class TestShopViews(TestShop):
             name = self.shop_details['name'],
             bio = self.shop_details['bio'],
             owner = User.objects.get(email = self.login_credentials['email']),
-            pickup_location = self.shop_details['pickup_location'],
+            pickup_location = Location.objects.get(pk = self.shop_details['pickup_location']),
             email_contact = self.shop_details['email_contact'],
         )
         shop.save()
