@@ -1,8 +1,10 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
 import uuid
 
 from apps.store.models import *
+from apps.delivery.models import *
 from django.conf import settings
 
 class Cart(models.Model):
@@ -33,3 +35,72 @@ class CartItem(models.Model):
 
     def __str__(self):
         return self.cart.token + " - " + self.product.name
+
+class ShopDailyOrders(models.Model):
+    """This will hold all the orders from a shop on a particular day
+
+    Args:
+        models ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    shop = models.ForeignKey(Shop,on_delete=models.SET_NULL,null=True,related_name="daily_orders")
+    pickup_means = models.ForeignKey(DeliveryMeans,on_delete=models.SET_NULL,null=True,related_name="daily_orders")
+    date = models.DateField(auto_now_add=True,editable=False)
+
+    def __str__(self):
+        return self.shop.name + " - " + self.date
+
+class Order(models.Model):
+    """This is a summary of a completed purchase
+
+    Args:
+        models ([type]): [description]
+    """
+    owner = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+    made_on = models.DateTimeField(auto_now_add=True,editable=False)
+    delivery_means = models.ForeignKey(DeliveryMeans,on_delete=models.SET_NULL,null=True)
+    staff_checked = models.BooleanField(default=False)
+    delivered = models.BooleanField(default=False)
+    id_password = models.CharField(max_length=256)
+    location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="orders")
+
+    def save(self,**kwargs):
+        some_salt = 'some_salt' 
+        self.id_password = make_password(self.id_password,some_salt)
+        super().save(**kwargs)
+
+    def __str__(self):
+        return "order - " + str(self.pk) + " to " +self.location.name
+
+class OrderItem(models.Model):
+    """This contains a single item within an order instance
+
+    Args:
+        models ([type]): [description]
+    """
+    order = models.ForeignKey(Order,on_delete=models.PROTECT,related_name="items")
+    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,related_name="order_items")
+    quantity = models.IntegerField()
+    current_price = models.DecimalField(max_digits=9,decimal_places=2)
+    seller_checked = models.BooleanField(default=False)
+    rider_checked = models.BooleanField(default=False)
+    staff_one_checked = models.BooleanField(default=False)
+    staff_two_checked = models.BooleanField(null=True)
+    daily_order = models.ForeignKey(ShopDailyOrders,on_delete=models.PROTECT,related_name="item")
+
+    @property
+    def requires_transit(self):
+        try:
+            if self.order.location.parent == self.product.owner.pickup_location.parent:
+                return False
+            return True
+        except:
+            return None
+
+    @property
+    def dispatched(self):
+        if self.rider_checked and self.seller_checked:
+            return True
+        return False
