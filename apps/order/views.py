@@ -9,6 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from apps.order.serializers import *
 from apps.order.models import *
 from apps.order.permissions import *
+from apps.account.permissions import IsStaff
 
 class CartView(APIView):
     """This handles the cart requests

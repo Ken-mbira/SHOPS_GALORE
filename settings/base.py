@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'apps.store',
     'apps.delivery',
     'apps.order',
+    'apps.storage',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
     'mptt',
