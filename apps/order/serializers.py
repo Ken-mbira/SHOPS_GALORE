@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.order.models import *
+from apps.order.checkout import cart_to_order
 
 class CartItemSerializer(serializers.ModelSerializer):
     """This handles the products in the cart
@@ -33,6 +34,28 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = ['owner','token','complete','created_at','cart_items']
 
+class CheckoutSerializer(serializers.Serializer):
+    """This defines the creation of an order from a cart
+
+    Args:
+        serializers ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    id = serializers.CharField(max_length=9,min_length=8)
+    location = serializers.CharField()
+
+    def create_order(self,cart):
+        try:
+            location = Location.objects.get(pk = self.validated_data['location'])
+            order = cart_to_order(cart.token,self.validated_data['id'],location)
+            return order
+        except Exception as e:
+            print(e)
+            raise serializers.ValidationError("There was a problem creating your order!")
+
+
 class UpdateCartSerializer(serializers.Serializer):
     """This handles updating the quantities of items in carts
 
@@ -54,3 +77,24 @@ class UpdateCartSerializer(serializers.Serializer):
             instance.delete()
 
         return instance.cart
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    """This handles a single item of an order
+
+    Args:
+        serializers ([type]): [description]
+    """
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
+
+class OrderSerializer(serializers.ModelSerializer):
+    """This handles the order instance
+
+    Args:
+        serializers ([type]): [description]
+    """
+    items = OrderItemSerializer(many=True)
+    class Meta:
+        model = Order
+        fields = ['owner','made_on','delivery_means','staff_checked','delivered','id_password','location','items']

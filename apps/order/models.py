@@ -58,7 +58,7 @@ class ShopDailyOrders(models.Model):
     date = models.DateField(auto_now_add=True,editable=False)
 
     def __str__(self):
-        return self.shop.name + " - " + self.date
+        return self.shop.name + " - " + str(self.date)
 
 class Order(models.Model):
     """This is a summary of a completed purchase

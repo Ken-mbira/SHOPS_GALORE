@@ -89,6 +89,20 @@ class CartItemView(APIView):
 
         return Response(data,responseStatus)
 
+    @swagger_auto_schema(request_body=CheckoutSerializer,responses={200:OrderSerializer()})
+    def put(self,request,format=None):
+        serializer = CheckoutSerializer(data=request.data)
+        cart = Cart.objects.get(token = request.META.get('HTTP_CART_TOKEN'))
+
+        if serializer.is_valid():
+            data = OrderSerializer(serializer.create_order(cart)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
 class UpdateCartView(APIView):
     """This handles updating the contents of the cart
 
@@ -115,7 +129,6 @@ class UpdateCartView(APIView):
 
         return Response(data,responseStatus)
 
-
     @swagger_auto_schema(responses={200:CartSerializer})
     def delete(self,request,id):
         try:
@@ -125,3 +138,21 @@ class UpdateCartView(APIView):
 
         item.delete()
         return Response("The cart item was removed!",status.HTTP_200_OK)
+
+# class OrderView(APIView):
+#     """This handles the viewing of order models
+
+#     Args:
+#         APIView ([type]): [description]
+#     """
+
+#     permission_classes = [IsBuyerPermission]
+
+#     def get(self,request,format=None):
+#         """This gets all the pending orders for a user
+
+#         Args:
+#             request ([type]): [description]
+#             format ([type], optional): [description]. Defaults to None.
+#         """
+#         orders = Order.objects.get()
