@@ -139,20 +139,29 @@ class UpdateCartView(APIView):
         item.delete()
         return Response("The cart item was removed!",status.HTTP_200_OK)
 
-# class OrderView(APIView):
-#     """This handles the viewing of order models
+class OrderView(APIView):
+    """This handles the viewing of order models
 
-#     Args:
-#         APIView ([type]): [description]
-#     """
+    Args:
+        APIView ([type]): [description]
+    """
 
-#     permission_classes = [IsBuyerPermission]
+    permission_classes = [IsBuyerPermission]
 
-#     def get(self,request,format=None):
-#         """This gets all the pending orders for a user
+    @swagger_auto_schema(responses={200:OrderSerializer()})
+    def get(self,request,format=None):
+        """This gets all the pending orders for a user
 
-#         Args:
-#             request ([type]): [description]
-#             format ([type], optional): [description]. Defaults to None.
-#         """
-#         orders = Order.objects.get()
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+        """
+        if request.META.get("HTTP_ORDER_TOKEN"):
+            order = Order.objects.get(token = request.META.get("HTTP_ORDER_TOKEN"))
+            data = OrderSerializer(order).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = "You have no active orders at the moment!"
+            responseStatus = status.HTTP_404_NOT_FOUND
+        
+        return Response(data,responseStatus)

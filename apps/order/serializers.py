@@ -84,6 +84,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     Args:
         serializers ([type]): [description]
     """
+    requires_transit = serializers.BooleanField()
     class Meta:
         model = OrderItem
         fields = '__all__'

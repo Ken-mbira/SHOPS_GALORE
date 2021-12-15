@@ -73,10 +73,14 @@ class Order(models.Model):
     delivered = models.BooleanField(default=False)
     id_password = models.CharField(max_length=256)
     location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="orders")
+    token = models.CharField(max_length=20,null=True,blank=True,unique=True)
 
     def save(self,**kwargs):
         some_salt = 'some_salt' 
         self.id_password = make_password(self.id_password,some_salt)
+
+        if self.token is None:
+            self.token = uuid.uuid4()
         super().save(**kwargs)
 
     def __str__(self):
