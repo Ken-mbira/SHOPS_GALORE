@@ -13,13 +13,18 @@ class Cart(models.Model):
     Args:
         models ([type]): [description]
     """
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,on_delete=models.SET_NULL,related_name="carts")
-    token = models.CharField(max_length=30, null=True, blank=True, unique=True, default=uuid.uuid4())
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True,on_delete=models.SET_NULL,related_name="carts")
+    token = models.CharField(max_length=30, null=True, blank=True, unique=True)
     complete = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return "cart- " + self.token
+
+    def save(self,**kwargs):
+        if self.token is None:
+            self.token  = uuid.uuid4()
+        super().save()
 
 class CartItem(models.Model):
     """This is one instance of a product within a cart
