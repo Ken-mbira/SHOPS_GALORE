@@ -66,4 +66,62 @@ class CartView(APIView):
         """
         data = CartSerializer(Cart.objects.filter(owner = request.user,complete = False),many = True).data
         return Response(data,status.HTTP_200_OK)
+
+class CartItemView(APIView):
+    """This handles individual cart items
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [IsBuyerPermission & CheckCartExists]
+
+    @swagger_auto_schema(request_body=CartItemSerializer,responses={200:CartSerializer()})
+    def post(self,request,format=None):
+        serializer = CartItemSerializer(data=request.data)
+        cart = Cart.objects.get(token = request.META.get('HTTP_CART_TOKEN'))
         
+        if serializer.is_valid():
+            data = CartSerializer(serializer.save(cart)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+class UpdateCartView(APIView):
+    """This handles updating the contents of the cart
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [IsBuyerPermission & CheckCartExists]
+
+    @swagger_auto_schema(responses={200:CartSerializer()})
+    def put(self,request,id):
+        try:
+            item = CartItem.objects.get(pk = id)
+        except:
+            return Response("The item was not found",status.HTTP_404_NOT_FOUND)
+
+        serializer = UpdateCartSerializer(data=request.data)
+        if serializer.is_valid():
+            data = CartSerializer(serializer.update_quantity(item)).data
+            responseStatus = status.HTTP_200_OK
+
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+
+    @swagger_auto_schema(responses={200:CartSerializer})
+    def delete(self,request,id):
+        try:
+            item = CartItem.objects.get(pk = id)
+        except:
+            return Response("The item was not found",status.HTTP_404_NOT_FOUND)
+
+        item.delete()
+        return Response("The cart item was removed!",status.HTTP_200_OK)

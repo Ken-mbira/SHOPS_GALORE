@@ -32,7 +32,7 @@ class CartItem(models.Model):
     Args:
         models ([type]): [description]
     """
-    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,related_name="cart_item")
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True,related_name="cart_item")
     cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart_items")
     added_on = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -40,6 +40,9 @@ class CartItem(models.Model):
 
     def __str__(self):
         return self.cart.token + " - " + self.product.name
+
+    class Meta:
+        unique_together = ("product","cart")
 
 class ShopDailyOrders(models.Model):
     """This will hold all the orders from a shop on a particular day

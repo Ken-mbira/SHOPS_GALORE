@@ -1,6 +1,9 @@
+from django.db.models import fields
 from rest_framework import permissions,status
 
 from rest_framework.exceptions import APIException
+
+from apps.order.models import *
 
 class IsBuyerPermission(permissions.BasePermission):
     """This checks if a user is a buyer
@@ -38,6 +41,18 @@ class CheckCart(permissions.BasePermission):
         else:
             return True
 
+
+class CheckCartExists(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.META.get('HTTP_CART_TOKEN'):
+            try:
+                Cart.objects.get(token = request.META.get('HTTP_CART_TOKEN'))
+                return True
+            except:
+                raise CartNotFound()
+        else:
+            raise NoCart()
+
 class NoCart(APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = {"message":"Your cart details were not provided"}
@@ -47,3 +62,8 @@ class IsAuthenticatedCustomer(APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = {"message":"You are not authorised to perform this action"}
     default_code = "not authenticated"
+
+class CartNotFound(APIException):
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = {"message":"The cart was not found!"}
+    default_code = "cart not found"
