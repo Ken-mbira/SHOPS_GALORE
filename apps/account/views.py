@@ -16,6 +16,7 @@ class UserView(APIView):
     Args:
         generics ([type]): [description]
     """
+    permission_classes = [CheckRole]
 
     @swagger_auto_schema(request_body=RegisterSerializer,responses={200: "Your account was created successfully"})
     def post(self,request,format=None):

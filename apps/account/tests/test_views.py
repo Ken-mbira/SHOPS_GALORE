@@ -190,7 +190,7 @@ class TestViews(TestSetUp):
             "first_name":"Machel",
             "last_name":"Mwokovu",
             "email":"mwokovu@gmail.com",
-            "role":1
+            "role":2
         }
         authorised_credentials = {
             "email":authorised_user_data['email'],
@@ -198,6 +198,9 @@ class TestViews(TestSetUp):
         }
 
         self.client.post(self.register_url,authorised_user_data)
+        auth_user = User.objects.get(email = "mwokovu@gmail.com")
+        auth_user.role = Role.objects.get(pk=1)
+        auth_user.save()
 
         another_user = User.objects.get(email = authorised_credentials['email'])
         another_user.is_active = True
@@ -223,7 +226,7 @@ class TestViews(TestSetUp):
             "first_name":"Machel",
             "last_name":"Mwokovu",
             "email":"mwokovu@gmail.com",
-            "role":1
+            "role":2
         }
         authorised_credentials = {
             "email":authorised_user_data['email'],
@@ -231,6 +234,9 @@ class TestViews(TestSetUp):
         }
 
         self.client.post(self.register_url,authorised_user_data)
+        auth_user = User.objects.get(email = "mwokovu@gmail.com")
+        auth_user.role = Role.objects.get(pk=1)
+        auth_user.save()
 
         another_user = User.objects.get(email = authorised_credentials['email'])
         another_user.is_active = True
