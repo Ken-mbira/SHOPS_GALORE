@@ -6,6 +6,7 @@ import uuid
 from apps.store.models import *
 from apps.delivery.models import *
 from django.conf import settings
+from phonenumber_field.modelfields import PhoneNumberField
 
 class Cart(models.Model):
     """This handles a users list of goods chosen for purchasing
@@ -73,6 +74,7 @@ class Order(models.Model):
     delivered = models.BooleanField(default=False)
     id_password = models.CharField(max_length=256)
     location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="orders")
+    phone_number = models.CharField(max_length=10)
     token = models.CharField(max_length=20,null=True,blank=True,unique=True)
 
     def save(self,**kwargs):
