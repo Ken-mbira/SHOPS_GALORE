@@ -45,11 +45,13 @@ class CheckoutSerializer(serializers.Serializer):
     """
     id = serializers.CharField(max_length=9,min_length=8)
     location = serializers.CharField()
+    phone_number = serializers.CharField(max_length=13,min_length=13)
 
     def create_order(self,cart):
         try:
             location = Location.objects.get(pk = self.validated_data['location'])
-            order = cart_to_order(cart.token,self.validated_data['id'],location)
+            phone_number = self.validated_data['phone_number']
+            order = cart_to_order(cart.token,self.validated_data['id'],location,phone_number)
             return order
         except Exception as e:
             print(e)
