@@ -3,9 +3,9 @@ from datetime import date
 
 import uuid
 
-def cart_to_order(token,id_password,location):
+def cart_to_order(token,id_password,location,phone_number):
     cart = Cart.objects.get(token = token)
-    order = Order(owner = cart.owner,id_password = id_password,location = location)
+    order = Order(owner = cart.owner,id_password = id_password,location = location,phone_number = phone_number)
     order.save()
 
     for item in cart.cart_items.iterator():
