@@ -215,3 +215,30 @@ class ReinstateAccount(APIView):
             data = serializer.errors
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
+
+class RegisterStaffView(APIView):
+    """This entails the registration of a new staff member
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsStaff]
+
+    @swagger_auto_schema(request_body=RegisterSerializer,responses={200:"The staff member was created successfully"})
+    def post(self,request,format=None):
+        """This handles the creation of a staff member
+
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+        """
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(request)
+            data = "The staff member was created successfully"
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)

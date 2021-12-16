@@ -2,6 +2,7 @@ from apps.account.tests.test_setup import TestSetUp
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.core import mail
+from django.urls import reverse
 
 from apps.account.models import *
 from apps.account.serializers import *
@@ -250,3 +251,27 @@ class TestViews(TestSetUp):
         response = self.client.post(self.reinstate_url,{"user":user.pk})
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         self.assertEqual(User.objects.get(email = self.login_credentials['email']).is_active,True)
+
+    def test_new_staff(self):
+        """This tests if a new staff member can be registered
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.role = Role.objects.get(pk=1)
+        user.save()
+
+        authorised_user_data = {
+            "password":"1234",
+            "first_name":"Machel",
+            "last_name":"Mwokovu",
+            "email":"mwokovu@gmail.com",
+            "role":2
+        }
+
+        self.authenticate(self.login_credentials)
+
+        response = self.client.post(reverse("new_staff"),authorised_user_data)
+
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
