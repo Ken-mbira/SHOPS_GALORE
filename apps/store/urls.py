@@ -13,4 +13,5 @@ urlpatterns = [
     path("product/stock/<int:id>/",views.StockView.as_view(),name="stock"),
     path("product/image/<int:id>/",views.UpdateDefaultImage.as_view(),name="update_default_image"),
     path("attribute/<int:id>",views.AttributeFilterView.as_view(),name="attribute"),
+    path("product/review/<int:id>/",views.ReviewView.as_view(),name="review"),
 ]
