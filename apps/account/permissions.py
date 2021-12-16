@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from rest_framework.exceptions import APIException
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -24,3 +25,14 @@ class IsStaff(permissions.BasePermission):
         if request.user.role.name == "staff":
             return True
         return False
+
+class CheckRole(permissions.BasePermission):
+    """This disables registration of a staff user via the registration endpoint
+
+    Args:
+        permissions ([type]): [description]
+    """
+    def has_permission(self, request, view):
+        if request.data['role'] == "1":
+            return False
+        return True
