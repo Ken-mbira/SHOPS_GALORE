@@ -224,3 +224,19 @@ class DefaultImageSerializer(serializers.Serializer):
         image.is_default = True
         image.save()
         return image.product    
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+        read_only_fields = ['user','product']
+
+    def save(self,request,product):
+        if request.user.is_authenticated:
+            review = Review(product = product,user = request.user,comment = self.validated_data['comment'],rating=self.validated_data['rating'])
+        else:
+            review = Review(product = product,comment = self.validated_data['comment'],rating=self.validated_data['rating'])
+
+        review.save()
+        return review

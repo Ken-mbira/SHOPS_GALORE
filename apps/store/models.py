@@ -3,6 +3,7 @@ from datetime import datetime
 
 from phonenumber_field.modelfields import PhoneNumberField
 from mptt.models import MPTTModel, TreeForeignKey
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from apps.account.models import User
 from apps.delivery.models import *
@@ -148,6 +149,24 @@ class Product(models.Model):
         if self.owner.active and Media.objects.filter(product = self).count() > 4:
             return True
         return False
+
+class Review(models.Model):
+    """This stores the customer opinions of the products
+
+    Args:
+        models ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name="reviews")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name="reviews",null=True,on_delete=models.SET_NULL)
+    created_on = models.DateTimeField(auto_now_add=True)
+    comment = models.TextField(null=True)
+    rating = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)])
+
+    def __str__(self):
+        return self.product.name + " rating"
 
 class Stock(models.Model):
     """This defines the quantities of the products
