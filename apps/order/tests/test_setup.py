@@ -22,10 +22,14 @@ class TestOrderSetUp(APITestCase):
             Role.objects.create(name="delivery")
             Role.objects.create(name="customer")
 
-        kajiado = Location(name="Kajiado")
+        zone1 = Location(name="zone1")
+        zone1.save()
+        kajiado = Location(name="Kajiado",parent = zone1)
         kajiado.save()
         kiserian = Location(name="kiserian",parent=kajiado)
         kiserian.save()
+
+        Storage.objects.create(name="Last heath",location = kiserian)
 
         Brand.objects.create(name="Gucci")
 

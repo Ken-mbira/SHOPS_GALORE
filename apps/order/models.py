@@ -7,6 +7,7 @@ from apps.store.models import *
 from apps.delivery.models import *
 from django.conf import settings
 from phonenumber_field.modelfields import PhoneNumberField
+from apps.storage.models import Storage
 
 class Cart(models.Model):
     """This handles a users list of goods chosen for purchasing
@@ -57,6 +58,7 @@ class ShopDailyOrders(models.Model):
     shop = models.ForeignKey(Shop,on_delete=models.SET_NULL,null=True,related_name="daily_orders")
     pickup_means = models.ForeignKey(DeliveryMeans,on_delete=models.SET_NULL,null=True,related_name="daily_orders")
     date = models.DateField(auto_now_add=True,editable=False)
+    storage_location = models.ForeignKey(Storage,on_delete=models.SET_NULL,null=True,related_name="shop_orders")
 
     def __str__(self):
         return self.shop.name + " - " + str(self.date)

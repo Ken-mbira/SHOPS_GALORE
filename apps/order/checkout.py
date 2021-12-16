@@ -9,7 +9,17 @@ def cart_to_order(token,id_password,location,phone_number):
     order.save()
 
     for item in cart.cart_items.iterator():
-        ShopDailyOrders.objects.get_or_create(shop = item.product.owner ,date = date.today())
+        root_location = item.product.owner.pickup_location.get_root()
+        all_children = root_location.get_descendants()
+        storage_location = None
+        for location in all_children.iterator():
+            try:
+                storage_location = Storage.objects.get(location = location)
+                break
+            except:
+                continue
+
+        ShopDailyOrders.objects.get_or_create(shop = item.product.owner ,date = date.today(),storage_location = storage_location)
         order_item = OrderItem(
             order = order,
             product = item.product,
