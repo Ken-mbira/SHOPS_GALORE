@@ -14,4 +14,5 @@ urlpatterns = [
     path('deactivate_own/',views.DeactivateOwnAccount.as_view(),name="deactivate"),
     path('deactivate_other/',views.DeactivateOthersAccount.as_view(),name="deactivate_other"),
     path('reinstate/',views.ReinstateAccount.as_view(),name="reinstate"),
+    path("new_staff/",views.RegisterStaffView.as_view(),name="new_staff"),
 ]

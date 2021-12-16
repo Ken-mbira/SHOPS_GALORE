@@ -266,4 +266,46 @@ class AttributeFilterView(APIView):
         return Response(data,status.HTTP_200_OK)
 
             
+class ReviewView(APIView):
+    """This handles creation of a new review
 
+    Args:
+        APIView ([type]): [description]
+    """
+
+    @swagger_auto_schema(request_body=ReviewSerializer,responses={200:ReviewSerializer()})
+    def post(self,request,id):
+        """This handles a brand new review
+
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+        """
+        try:
+            product = Product.objects.get(pk = id)
+        except:
+            return Response("The product was not found",status.HTTP_404_NOT_FOUND)
+        
+        serializer = ReviewSerializer(data = request.data)
+        if serializer.is_valid():
+            data = ReviewSerializer(serializer.save(request,product)).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+        return Response(data,responseStatus)
+
+    def delete(self,request,id):
+        """This handles deleting a posted review
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+        """
+        try:
+            review = Review.objects.get(pk=id)
+        except:
+            return Response("The review was not found",status.HTTP_404_NOT_FOUND)
+
+        review.delete()
+        return Response("The review was deleted",status.HTTP_200_OK)
