@@ -262,12 +262,17 @@ class TestViews(TestSetUp):
         user.role = Role.objects.get(pk=1)
         user.save()
 
+        Location.objects.create(name="location1")
+
+        StorageFacility.objects.create(name="Last Heath",location = Location.objects.get(pk=1))
+
         authorised_user_data = {
             "password":"1234",
             "first_name":"Machel",
             "last_name":"Mwokovu",
             "email":"mwokovu@gmail.com",
-            "role":2
+            "role":1,
+            "storage_facility":1
         }
 
         self.authenticate(self.login_credentials)
