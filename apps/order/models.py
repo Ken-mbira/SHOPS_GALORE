@@ -110,7 +110,7 @@ class OrderItem(models.Model):
     @property
     def requires_transit(self):
         try:
-            if self.order.location.parent == self.product.owner.pickup_location.parent:
+            if self.order.location.get_root() == self.product.owner.pickup_location.get_root():
                 return False
             return True
         except:

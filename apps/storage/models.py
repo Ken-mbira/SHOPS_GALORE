@@ -23,7 +23,7 @@ class DailyTransit(models.Model):
     """
     start_location = models.ForeignKey(StorageFacility,on_delete=models.SET_NULL,null=True,related_name="transit_start_location")
     end_location = models.ForeignKey(StorageFacility,on_delete=models.SET_NULL,null=True,related_name="transit_end_location")
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True)
     arrived_on = models.DateTimeField(null=True, blank=True)
     delivered = models.BooleanField(default=False)
 

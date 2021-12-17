@@ -34,7 +34,7 @@ class TestOrders(TestOrderSetUp):
         self.assertEqual(test_cart_item[0].product,product)
 
     def test_transform_cart(self):
-        """This test the remove from cart functionality
+        """This transfrom cart functionality
         """
         token = self.client.post(reverse('cart')).data
         product = Product.objects.get(name="Leather jacket")
@@ -74,7 +74,7 @@ class TestOrders(TestOrderSetUp):
 
         self.assertTrue(CartItem.objects.filter(cart = Cart.objects.get(token=token)).count(),2)
 
-    def transform_cart_with_multiple(self):
+    def test_transform_cart_with_multiple(self):
         """This checks if the user can checkout with multiple objects in their carts
         """
         token = self.client.post(reverse('cart')).data
@@ -98,3 +98,37 @@ class TestOrders(TestOrderSetUp):
         response = self.client.put(reverse("cart_item"),delivery_information)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         self.assertTrue(ShopDailyOrders.objects.all().count() == 2)
+
+    def test_transform_cart_with_multiple_locations(self):
+        """This checks if the user can checkout with multiple objects from multiple locations
+        """
+        token = self.client.post(reverse('cart')).data
+        product1 = Product.objects.get(name="Leather jacket")
+        product_info = {
+            'product':product1.pk
+        }
+        product2 = Product.objects.get(name="Range Rover Sport")
+        product2_info = {
+            "product":product2.pk
+        }
+        product3 = Product.objects.get(name="Building tiles")
+        product3_info = {
+            "product":product3.pk
+        }
+        self.client.credentials(HTTP_CART_TOKEN=token)
+        self.client.post(reverse("cart_item"),product_info)
+        self.client.post(reverse("cart_item"),product2_info)
+        self.client.post(reverse("cart_item"),product3_info)
+
+        delivery_information = {
+            "id":"12345678",
+            "location":"2",
+            "phone_number":"+254758926990"
+        }
+        daily_transit = DailyTransit.objects.all().count()
+        self.assertEqual(daily_transit,0)
+        response = self.client.put(reverse("cart_item"),delivery_information)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
+        daily_transit = DailyTransit.objects.all().count()
+        self.assertEqual(daily_transit,1)

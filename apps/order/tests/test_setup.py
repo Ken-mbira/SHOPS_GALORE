@@ -29,7 +29,18 @@ class TestOrderSetUp(APITestCase):
         kiserian = Location(name="kiserian",parent=kajiado)
         kiserian.save()
 
+        zone2 = Location(name="zone2")
+        zone2.save()
+        mombasa = Location(name="Mombasa",parent = zone2)
+        mombasa.save()
+        fort_jesus = Location(name="fort_jesus",parent = mombasa)
+        fort_jesus.save()
+        mpeketoni = Location(name="Mpeketoni",parent=mombasa)
+        mpeketoni.save()
+
         StorageFacility.objects.create(name="Last heath",location = kiserian)
+
+        StorageFacility.objects.create(name="The Escape",location = fort_jesus)
 
         Brand.objects.create(name="Gucci")
 
@@ -105,7 +116,7 @@ class TestOrderSetUp(APITestCase):
             brand = Brand.objects.get(name="Gucci"),
             category = cars_category,
             type=cars_type,
-            owner = Shop.objects.get(email_contact="mavazi@corp.com"),
+            owner = Shop.objects.get(email_contact="magari@kibao.com"),
             description = "Keep warm this winter",
             price="12.50"
         )
@@ -115,6 +126,32 @@ class TestOrderSetUp(APITestCase):
         stock.count += 2
         stock.last_stock_check_date = datetime.now()
         stock.save()
+
+        Shop.objects.create(
+            name="Majengo Building tools",
+            bio = "Build safe",
+            owner = User.objects.get(email="first@store.com"),
+            pickup_location = mpeketoni,
+            phone_contact = "+254758926990",
+            email_contact = "majengo@builds.com",
+        )
+
+        Product.objects.create(
+            name="Building tiles",
+            brand = Brand.objects.get(name="Gucci"),
+            category = cars_category,
+            type=cars_type,
+            owner = Shop.objects.get(email_contact="majengo@builds.com"),
+            description = "Building tiles",
+            price="1000.00"
+        )
+
+        stock = Stock.objects.get(product = Product.objects.get(name="Building tiles"))
+
+        stock.count += 2
+        stock.last_stock_check_date = datetime.now()
+        stock.save()
+
 
 
         customer_data = {
