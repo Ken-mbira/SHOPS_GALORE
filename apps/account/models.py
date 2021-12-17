@@ -139,3 +139,12 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.first_name + "'s profile"
+
+class StaffProfile(models.Model):
+    """This holds information on a staff members assigned storage facility
+
+    Args:
+        models ([type]): [description]
+    """
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="staff_profile")
+    storage_facility = models.ForeignKey("storage.StorageFacility",on_delete=models.SET_NULL,null=True)
