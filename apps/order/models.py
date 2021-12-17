@@ -7,7 +7,7 @@ from apps.store.models import *
 from apps.delivery.models import *
 from django.conf import settings
 from phonenumber_field.modelfields import PhoneNumberField
-from apps.storage.models import Storage
+from apps.storage.models import DailyTransit, StorageFacility
 
 class Cart(models.Model):
     """This handles a users list of goods chosen for purchasing
@@ -58,7 +58,7 @@ class ShopDailyOrders(models.Model):
     shop = models.ForeignKey(Shop,on_delete=models.SET_NULL,null=True,related_name="daily_orders")
     pickup_means = models.ForeignKey(DeliveryMeans,on_delete=models.SET_NULL,null=True,related_name="daily_orders")
     date = models.DateField(auto_now_add=True,editable=False)
-    storage_location = models.ForeignKey(Storage,on_delete=models.SET_NULL,null=True,related_name="shop_orders")
+    storage_location = models.ForeignKey(StorageFacility,on_delete=models.SET_NULL,null=True,related_name="shop_orders")
 
     def __str__(self):
         return self.shop.name + " - " + str(self.date)
@@ -105,11 +105,12 @@ class OrderItem(models.Model):
     staff_one_checked = models.BooleanField(default=False)
     staff_two_checked = models.BooleanField(null=True)
     daily_order = models.ForeignKey(ShopDailyOrders,on_delete=models.PROTECT,related_name="item")
+    transit = models.ForeignKey(DailyTransit,on_delete=models.SET_NULL,null=True,blank=True,related_name="items")
 
     @property
     def requires_transit(self):
         try:
-            if self.order.location.parent == self.product.owner.pickup_location.parent:
+            if self.order.location.get_root() == self.product.owner.pickup_location.get_root():
                 return False
             return True
         except:
