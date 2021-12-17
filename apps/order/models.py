@@ -7,7 +7,7 @@ from apps.store.models import *
 from apps.delivery.models import *
 from django.conf import settings
 from phonenumber_field.modelfields import PhoneNumberField
-from apps.storage.models import Storage
+from apps.storage.models import *
 
 class Cart(models.Model):
     """This handles a users list of goods chosen for purchasing
@@ -105,6 +105,7 @@ class OrderItem(models.Model):
     staff_one_checked = models.BooleanField(default=False)
     staff_two_checked = models.BooleanField(null=True)
     daily_order = models.ForeignKey(ShopDailyOrders,on_delete=models.PROTECT,related_name="item")
+    transit = models.ForeignKey(DailyTransit,on_delete=models.SET_NULL,null=True,blank=True,related_name="items")
 
     @property
     def requires_transit(self):
