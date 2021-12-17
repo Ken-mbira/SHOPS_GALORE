@@ -15,6 +15,23 @@ class Location(MPTTModel):
     def __str__(self):
         return self.name
 
+    # def get_storage_locations(self):
+    #     """This will get the first storage facility within the children of a location
+
+    #     Returns:
+    #         [type]: [description]
+    #     """
+    #     all_children = self.get_descendants()
+    #     for location in all_children.iterator():
+    #         try:
+    #             storage_location = Storage.objects.get(location = location)
+    #             break
+    #         except:
+    #             storage_location = None
+    #             continue
+
+    #     return storage_location
+
 class Means(models.Model):
     """This entails the various ways of transportation
 

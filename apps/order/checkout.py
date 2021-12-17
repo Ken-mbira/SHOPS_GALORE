@@ -3,6 +3,8 @@ from datetime import date
 
 import uuid
 
+from apps.storage.models import StorageFacility
+
 def cart_to_order(token,id_password,location,phone_number):
     cart = Cart.objects.get(token = token)
     order = Order(owner = cart.owner,id_password = id_password,location = location,phone_number = phone_number)
@@ -14,7 +16,7 @@ def cart_to_order(token,id_password,location,phone_number):
         storage_location = None
         for location in all_children.iterator():
             try:
-                storage_location = Storage.objects.get(location = location)
+                storage_location = StorageFacility.objects.get(location = location)
                 break
             except:
                 continue

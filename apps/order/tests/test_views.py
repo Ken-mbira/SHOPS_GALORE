@@ -51,7 +51,7 @@ class TestOrders(TestOrderSetUp):
         response = self.client.put(reverse("cart_item"),delivery_information)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
-        storage_location = Storage.objects.get(name="Last heath")
+        storage_location = StorageFacility.objects.get(name="Last heath")
         daily_orders = ShopDailyOrders.objects.all()
         self.assertEqual(daily_orders[0].storage_location,storage_location)
         self.assertEqual(daily_orders.count(),1)

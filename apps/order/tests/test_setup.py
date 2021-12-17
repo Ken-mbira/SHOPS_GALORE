@@ -29,7 +29,7 @@ class TestOrderSetUp(APITestCase):
         kiserian = Location(name="kiserian",parent=kajiado)
         kiserian.save()
 
-        Storage.objects.create(name="Last heath",location = kiserian)
+        StorageFacility.objects.create(name="Last heath",location = kiserian)
 
         Brand.objects.create(name="Gucci")
 
