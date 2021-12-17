@@ -222,9 +222,9 @@ class RegisterStaffView(APIView):
     Args:
         APIView ([type]): [description]
     """
-    permission_classes = [permissions.IsAuthenticated & IsStaff]
+    permission_classes = [permissions.IsAuthenticated & CheckRegisterNewStaff]
 
-    @swagger_auto_schema(request_body=RegisterSerializer,responses={200:"The staff member was created successfully"})
+    @swagger_auto_schema(request_body=RegisterStaffSerializer,responses={200:"The staff member was created successfully"})
     def post(self,request,format=None):
         """This handles the creation of a staff member
 
@@ -232,7 +232,7 @@ class RegisterStaffView(APIView):
             request ([type]): [description]
             format ([type], optional): [description]. Defaults to None.
         """
-        serializer = RegisterSerializer(data=request.data)
+        serializer = RegisterStaffSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(request)
             data = "The staff member was created successfully"

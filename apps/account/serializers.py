@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from apps.account.models import *
 from apps.account.emails import send_account_activation_email
+from apps.storage.models import *
 
 class RegisterSerializer(serializers.ModelSerializer):
     """This defines the fields involved in creation of a user
@@ -23,6 +24,34 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
         current_site = get_current_site(request)
         send_account_activation_email(current_site,user)
+        return user
+
+class RegisterStaffSerializer(serializers.ModelSerializer):
+    """This involves creation of a new staff member
+
+    Args:
+        serializers ([type]): [description]
+
+    Raises:
+        serializers.ValidationError: [description]
+        serializers.ValidationError: [description]
+
+    Returns:
+        [type]: [description]
+    """
+    storage_facility = serializers.IntegerField(required=True)
+    class Meta:
+        model = User
+        fields = ['password','email','role','first_name','last_name','storage_facility']
+
+    def save(self,request):
+        storage_facility = StorageFacility.objects.get(pk=self.validated_data['storage_facility'])
+        user = User(first_name = self.validated_data['first_name'], last_name=self.validated_data['last_name'],email=self.validated_data['email'],role=self.validated_data['role'])
+        user.set_password(self.validated_data['password'])
+        user.save()
+        staff_profile = StaffProfile.objects.get(user = user)
+        staff_profile.storage_facility = storage_facility
+        staff_profile.save()
         return user
 
 class RoleSerializer(serializers.ModelSerializer):
