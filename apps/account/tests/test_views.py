@@ -280,3 +280,4 @@ class TestViews(TestSetUp):
         response = self.client.post(reverse("new_staff"),authorised_user_data)
 
         self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(User.objects.get(email = authorised_user_data['email']).staff_profile.storage_facility,StorageFacility.objects.get(name="Last Heath"))
