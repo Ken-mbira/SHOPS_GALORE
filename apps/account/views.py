@@ -10,6 +10,30 @@ from apps.account.permissions import *
 from apps.account.serializers import *
 from apps.account.models import *
 
+class RolesView(APIView):
+    """This gets all the roles available
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    @swagger_auto_schema(responses={200:RoleSerializer()})
+    def get(self,request):
+        """This returns all the roles
+
+        Args:
+            request ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+
+        roles = Role.objects.all()
+        data = RoleSerializer(roles,many=True).data
+        return Response(data,status.HTTP_200_OK)
+
 class UserView(APIView):
     """This can create a user or be used to get all instances of users
 
