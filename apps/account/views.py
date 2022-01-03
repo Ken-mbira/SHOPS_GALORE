@@ -60,16 +60,11 @@ class UserInstanceView(APIView):
     Args:
         APIView ([type]): [description]
     """
+    permission_classes = [permissions.IsAuthenticated]
     @swagger_auto_schema(responses={200: GetUserSerializer()})
-    def get(self,request,token):
-        data = {}
-        try:
-            validated_token = Token.objects.get(key=token)
-            data = GetUserSerializer(validated_token.user).data
-            responseStatus = status.HTTP_200_OK
-        except:
-            data = "The token does not exist!"
-            responseStatus = status.HTTP_404_NOT_FOUND
+    def get(self,request):
+        data = GetUserSerializer(request.user).data
+        responseStatus = status.HTTP_200_OK
 
         return Response(data,status=responseStatus)
 

@@ -45,20 +45,20 @@ class TestViews(TestSetUp):
 
         self.assertEqual(res.status_code,status.HTTP_401_UNAUTHORIZED)
 
-    def test_get_user_instance(self):
-        """This tests whether the get user instance endpoint returns a user instance
-        """
-        self.client.post(self.register_url,self.user_data)
+    # def test_get_user_instance(self):
+    #     """This tests whether the get user instance endpoint returns a user instance
+    #     """
+    #     self.client.post(self.register_url,self.user_data)
 
-        user = User.objects.get(email = self.login_credentials['email'])
-        user.is_active = True
-        user.save()
+    #     user = User.objects.get(email = self.login_credentials['email'])
+    #     user.is_active = True
+    #     user.save()
 
-        correct_instance = GetUserSerializer(User.objects.get(email = self.login_credentials['email'])).data
+    #     correct_instance = GetUserSerializer(User.objects.get(email = self.login_credentials['email'])).data
 
-        token = self.client.post(self.login_url,self.login_credentials).data
-        instance = self.client.get(self.login_url + f"{token}")
-        self.assertEqual(correct_instance,instance.data)  
+    #     token = self.client.post(self.login_url,self.login_credentials).data
+    #     instance = self.client.get(self.login_url + f"{token}")
+    #     self.assertEqual(correct_instance,instance.data)  
 
     def authenticate(self,user_data):
         response = self.client.post(self.auth_url,user_data)
