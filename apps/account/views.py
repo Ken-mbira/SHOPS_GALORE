@@ -10,6 +10,30 @@ from apps.account.permissions import *
 from apps.account.serializers import *
 from apps.account.models import *
 
+class RolesView(APIView):
+    """This gets all the roles available
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    @swagger_auto_schema(responses={200:RoleSerializer()})
+    def get(self,request):
+        """This returns all the roles
+
+        Args:
+            request ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+
+        roles = Role.objects.all()
+        data = RoleSerializer(roles,many=True).data
+        return Response(data,status.HTTP_200_OK)
+
 class UserView(APIView):
     """This can create a user or be used to get all instances of users
 
@@ -60,16 +84,11 @@ class UserInstanceView(APIView):
     Args:
         APIView ([type]): [description]
     """
+    permission_classes = [permissions.IsAuthenticated]
     @swagger_auto_schema(responses={200: GetUserSerializer()})
-    def get(self,request,token):
-        data = {}
-        try:
-            validated_token = Token.objects.get(key=token)
-            data = GetUserSerializer(validated_token.user).data
-            responseStatus = status.HTTP_200_OK
-        except:
-            data = "The token does not exist!"
-            responseStatus = status.HTTP_404_NOT_FOUND
+    def get(self,request):
+        data = GetUserSerializer(request.user).data
+        responseStatus = status.HTTP_200_OK
 
         return Response(data,status=responseStatus)
 
