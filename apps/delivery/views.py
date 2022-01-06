@@ -23,7 +23,7 @@ class LocationView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(responses={200:LocationSerializer()})
+    @swagger_auto_schema(responses={200:"results"})
     def get(self,request,format=None):
         locations = Location.objects.filter(level=0)
         data = LocationSerializer(locations,many=True).data

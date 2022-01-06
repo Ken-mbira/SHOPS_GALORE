@@ -1,13 +1,38 @@
 from rest_framework import serializers,status
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from apps.account.models import *
 from apps.store.models import *
 from apps.delivery.models import *
 
-class RecursiveField(serializers.Serializer):
+class RecursiveField(serializers.BaseSerializer):
+    def to_representation(self, value):
+        depth = self.context.get('depth', 0)
+        self.context['depth'] = depth+1
+        ParentSerializer = self.parent.parent.__class__
+        serializer = ParentSerializer(value, context=self.context, depth=self.context['depth'])
 
-    def to_native(self,value):
-        return LocationSerializer(value,context = {"parent":self.parent.object, "parent_serializer":self.parent})
+        return serializer.data
+
+    def to_internal_value(self, data):
+        ParentSerializer = self.parent.parent.__class__
+        Model = ParentSerializer.Meta.model
+        try:
+            instance = Model.objects.get(pk=data)
+        except ObjectDoesNotExist:
+            raise serializers.ValidationError(
+                "Objeto {0} does not exists".format(
+                    Model().__class__.__name__
+                )
+            )
+        return instance
+
+
+# class RecursiveField(serializers.Serializer):
+
+#     def to_native(self,value):
+#         return LocationSerializer(value,context = {"parent":self.parent.object, "parent_serializer":self.parent})
 
 class LocationSerializer(serializers.ModelSerializer):
     """This handles the location model
@@ -18,13 +43,18 @@ class LocationSerializer(serializers.ModelSerializer):
     Returns:
         [type]: [description]
     """
+    def __init__(self, *args, depth=0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.depth = depth
+
     class Meta:
         model = Location
         fields = ['id','name']
 
     def get_fields(self):
         fields = super(LocationSerializer,self).get_fields()
-        fields['children'] = LocationSerializer(many=True,required=False)
+        if self.depth !=1:
+            fields['children'] = LocationSerializer(many=True,required=False)
         return fields
 
 class RegisterMeansSerializer(serializers.ModelSerializer):
