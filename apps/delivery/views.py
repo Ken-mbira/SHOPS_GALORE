@@ -12,6 +12,23 @@ from apps.delivery.models import *
 from apps.delivery.serializers import *
 from apps.delivery.permissions import *
 
+class LocationView(APIView):
+    """This handles the getting of all the locations
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(responses={200:LocationSerializer()})
+    def get(self,request,format=None):
+        locations = Location.objects.filter(level=0)
+        data = LocationSerializer(locations,many=True).data
+        return Response(data,status.HTTP_200_OK)
+
 class DeliveryMeansView(APIView):
     """This handles requests for a users means
 

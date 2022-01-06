@@ -4,6 +4,29 @@ from apps.account.models import *
 from apps.store.models import *
 from apps.delivery.models import *
 
+class RecursiveField(serializers.Serializer):
+
+    def to_native(self,value):
+        return LocationSerializer(value,context = {"parent":self.parent.object, "parent_serializer":self.parent})
+
+class LocationSerializer(serializers.ModelSerializer):
+    """This handles the location model
+
+    Args:
+        serializers ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    class Meta:
+        model = Location
+        fields = ['id','name']
+
+    def get_fields(self):
+        fields = super(LocationSerializer,self).get_fields()
+        fields['children'] = LocationSerializer(many=True,required=False)
+        return fields
+
 class RegisterMeansSerializer(serializers.ModelSerializer):
     """This handles the means
 
