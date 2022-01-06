@@ -5,6 +5,11 @@ from rest_framework import serializers
 
 from apps.store.models import *
 
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
 class ShopSerializer(serializers.ModelSerializer):
     """this handles the shop instances
 
@@ -13,7 +18,7 @@ class ShopSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Shop
-        fields = '__all__'
+        fields = ['id','name','bio','created_on','logo','phone_contact','email_contact','subscription_end_date','functional','owner','pickup_location','products']
         read_only_fields = ['logo','subscription_end_date','owner','functional']
 
     def save(self,request):
@@ -92,11 +97,6 @@ class CreateProductSerializers(serializers.ModelSerializer):
 
         instance.save()
         return instance
-
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '__all__'
 
 class StockSerializer(serializers.ModelSerializer):
     """This handles the stocks for a single product

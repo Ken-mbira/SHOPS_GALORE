@@ -35,6 +35,12 @@ class Shop(models.Model):
             return False
         return True
 
+    @property
+    def products(self):
+        """This gets all the products within a shop
+        """
+        return Product.objects.filter(owner = self).count()
+
     def deactivate(self):
         self.functional = False
         self.save()
