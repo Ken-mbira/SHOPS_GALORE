@@ -50,6 +50,26 @@ class UpdateShopView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsShopOwner]
 
+    @swagger_auto_schema(responses={200:ShopSerializer})
+    def get(self,request,id):
+        """This returns a single shop instance
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        try:
+            instance = Shop.objects.get(pk = id)
+            data = ShopSerializer(instance).data
+            return Response(data,status.HTTP_200_OK)
+        
+        except:
+            return Response("The shop was not found",status.HTTP_404_NOT_FOUND)
+
+
     @swagger_auto_schema(request_body=ShopSerializer,responses={200:ShopSerializer})
     def put(self,request,id):
         serializer = ShopSerializer(data = request.data)
