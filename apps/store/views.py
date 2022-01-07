@@ -42,6 +42,31 @@ class RegisterShopView(APIView):
 
         return Response(data,responseStatus)
 
+class ShopProductView(APIView):
+    """This handles the products from a single shop
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsShopOwner]
+    @swagger_auto_schema(responses={200:ShopSerializer()})
+    def get(self,request,id):
+        """This returns all the products in a shop
+
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+
+        Returns:
+            [type]: [description]
+        """
+        data = ProductSerializer(Product.objects.filter(owner =  Shop.objects.get(pk = id)),many=True).data
+        return Response(data,status.HTTP_200_OK)
+
+
 class UpdateShopView(APIView):
     """This handles requests to alter the shop instances
 
