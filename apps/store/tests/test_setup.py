@@ -60,7 +60,8 @@ class TestShop(APITestCase):
             "description": "A leather jacket for men",
             "price": "12.50",
             "volume":100,
-            "sku":"asdfafdadf"
+            "sku":"asdfafdadf",
+            "weight":10
         }
 
         self.parent_product_details = {
@@ -78,7 +79,8 @@ class TestShop(APITestCase):
             "attributes": [
                 "1","2"
             ],
-            "parent":1
+            "parent":1,
+            "weight":10
         }
 
         return super().setUp()

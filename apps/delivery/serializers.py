@@ -1,6 +1,6 @@
 from rest_framework import serializers,status
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 from apps.account.models import *
 from apps.store.models import *
@@ -104,7 +104,8 @@ class DestinationSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Destination
-        feilds = ['location_from','location_to','price']
+        feilds = ['location_from','location_to','price','means']
+        read_only_fields = ['means']
 
     def save(self,means):
         """Handles saving a means
@@ -115,29 +116,14 @@ class DestinationSerializer(serializers.ModelSerializer):
         Returns:
             [type]: [description]
         """
-        destination = Destination(means = means,location_from= self.validated_data['location_from'],location_to = self.validated_data['location_to'],price=self.validated_data['price'])
+        try:
+            destination = Destination(means = means,location_from= self.validated_data['location_from'],location_to = self.validated_data['location_to'],price=self.validated_data['price'])
+            destination.save()
+            return destination
 
-        destination.save()
-
-class DestinationSerializer(serializers.ModelSerializer):
-    """This will handle a destination for a specific location
-
-    Args:
-        serializers ([type]): [description]
-    """
-    class Meta:
-        model = Destination
-        fields = '__all__'
-        read_only_fields = ['means']
-
-    def save(self,means):
-        destination = Destination(
-            means = means,
-            location = self.validated_data['location'],
-            price = self.validated_data['price']
-        )
-        destination.save()
-        return destination
+        except Exception as e:
+            print(e)
+            raise ValidationError("You have already set such a destination!")
 
 class DestinationPriceSerializer(serializers.Serializer):
     """This handles updating a destination's price

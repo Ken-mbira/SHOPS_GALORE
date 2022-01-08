@@ -17,6 +17,11 @@ class TestDelivery(APITestCase):
             Role.objects.create(name="delivery")
             Role.objects.create(name="customer")
 
+        self.parent_location = Location.objects.create(name="Kajiado")
+        self.location = Location.objects.create(name="Kiserian",parent = self.parent_location)
+
+        self.motorbike_means = Means.objects.create(name="motorbike",description="small vehicle")
+
         return super().setUp()
 
     def tearDown(self):

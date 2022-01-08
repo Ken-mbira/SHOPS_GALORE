@@ -73,7 +73,7 @@ class CreateProductWithoutVariation(serializers.ModelSerializer):
     """
     class Meta:
         model = Product
-        fields = ['name','brand','category','type','description','price','volume','sku']
+        fields = ['name','brand','category','type','description','price','volume','sku','weight']
 
     def save(self,shop):
         product = Product(
@@ -85,7 +85,8 @@ class CreateProductWithoutVariation(serializers.ModelSerializer):
             description = self.validated_data['description'],
             price = self.validated_data['price'],
             volume = self.validated_data['volume'],
-            sku = self.validated_data['sku']
+            sku = self.validated_data['sku'],
+            weight = self.validated_data['weight']
         )
         product.save()
 
@@ -138,7 +139,7 @@ class CreateChildProductSerializer(serializers.ModelSerializer):
     parent = serializers.IntegerField(required=True)
     class Meta:
         model = Product
-        fields = ['price','volume','sku','parent','attributes']
+        fields = ['price','volume','sku','parent','attributes','weight']
 
     def save(self,shop):
         try:
@@ -157,7 +158,8 @@ class CreateChildProductSerializer(serializers.ModelSerializer):
             price = self.validated_data['price'],
             volume = self.validated_data['volume'],
             sku = self.validated_data['sku'],
-            parent = parent
+            parent = parent,
+            weight = self.validated_data['weight']
         )
         product.save()
         for value in self.validated_data['attributes']:

@@ -98,6 +98,43 @@ class UpdateMeans(APIView):
         data = "The image was successfully deleted"
         return Response(data,status.HTTP_200_OK)
 
+class CreateDestinationView(APIView):
+    """This handles creation and listing of destinations
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    permission_classes=[permissions.IsAuthenticated & IsDeliveryGuy & IsMeansOwner]
+
+    @swagger_auto_schema(request_body=DestinationSerializer,responses={200:DestinationSerializer})
+    def post(self,request,id):
+        """this handles creation of a new destination
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+
+        means = Means.objects.get(pk = id)
+        serializer = DestinationSerializer(data=request.data)
+        if serializer.is_valid():
+            destination = serializers.save(means)
+            data = DestinationSerializer(destination).data
+            responseStatus = status.HTTP_200_OK
+
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+
 class DestinationView(APIView):
     """This handles a single destination
 
