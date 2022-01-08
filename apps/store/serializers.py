@@ -121,6 +121,52 @@ class CreateParentProductSerializer(serializers.ModelSerializer):
 
         return product
 
+class CreateChildProductSerializer(serializers.ModelSerializer):
+    """This handles a child product
+
+    Args:
+        serializers ([type]): [description]
+
+    Raises:
+        ValidationError: [description]
+        ValidationError: [description]
+
+    Returns:
+        [type]: [description]
+    """
+    attributes = serializers.ListField()
+    parent = serializers.IntegerField(required=True)
+    class Meta:
+        model = Product
+        fields = ['price','volume','sku','parent','attributes']
+
+    def save(self,shop):
+        try:
+            parent = Product.objects.get(pk = self.validated_data['parent'])
+
+        except:
+            raise ValidationError("No product was found with that parent id")
+
+        product = Product(
+            name = parent.name,
+            owner = shop,
+            brand = parent.brand,
+            category = parent.category,
+            type = parent.type,
+            description = parent.description,
+            price = self.validated_data['price'],
+            volume = self.validated_data['volume'],
+            sku = self.validated_data['sku'],
+            parent = parent
+        )
+        product.save()
+        for value in self.validated_data['attributes']:
+            attribute_value = AttributeValue.objects.get(pk = int(value))
+            product.attribute_value.add(attribute_value)
+            product.save()
+
+        return product
+
 
     
 class CreateProductSerializers(serializers.ModelSerializer):
