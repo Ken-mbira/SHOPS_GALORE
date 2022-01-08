@@ -42,6 +42,9 @@ class DeliveryMeans(models.Model):
     def __str__(self):
         return self.owner.first_name + " - " + self.means.name
 
+    class Meta:
+        unique_together = ("owner","means")
+
 class Destination(models.Model):
     """This shows the location covered by a means of transport along with the price
 
@@ -55,3 +58,6 @@ class Destination(models.Model):
 
     def __str__(self):
         self.means + " - " + self.location.name
+
+    class Meta:
+        unique_together = ("means","location_from","location_to")

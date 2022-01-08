@@ -94,6 +94,32 @@ class DeliveryMeansImage(serializers.Serializer):
         means.save()
 
 class DestinationSerializer(serializers.ModelSerializer):
+    """This handles the creation of a destination
+
+    Args:
+        serializers ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    class Meta:
+        model = Destination
+        feilds = ['location_from','location_to','price']
+
+    def save(self,means):
+        """Handles saving a means
+
+        Args:
+            means ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        destination = Destination(means = means,location_from= self.validated_data['location_from'],location_to = self.validated_data['location_to'],price=self.validated_data['price'])
+
+        destination.save()
+
+class DestinationSerializer(serializers.ModelSerializer):
     """This will handle a destination for a specific location
 
     Args:
