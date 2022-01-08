@@ -75,7 +75,8 @@ class RegisterMeansSerializer(serializers.ModelSerializer):
         mean = DeliveryMeans(
             owner = request.user,
             means = self.validated_data['means'],
-            image = self.validated_data['image']
+            image = self.validated_data['image'],
+            max_weight = self.validated_data['max_weight']
         )
 
         mean.save()
