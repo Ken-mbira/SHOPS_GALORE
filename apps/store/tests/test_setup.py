@@ -62,6 +62,15 @@ class TestShop(APITestCase):
             "volume":100,
             "sku":"asdfafdadf"
         }
+
+        self.parent_product_details = {
+            "name": "Mens Leather Jacket",
+            "brand": 1,
+            "category": 1,
+            "type": 1,
+            "description": "A leather jacket for men"
+        }
+
         return super().setUp()
 
     def tearDown(self):

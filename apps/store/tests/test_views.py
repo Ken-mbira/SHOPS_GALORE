@@ -328,6 +328,27 @@ class TestShopViews(TestShop):
 
         self.assertEqual(Product.objects.all().count(),1)
 
+    def test_create_parent_product(self):
+        """This will test if a parent product can be created for the first time
+        """
+        self.client.post(self.register_url,self.user_data)
+
+        user = User.objects.get(email = self.login_credentials['email'])
+        user.is_active = True
+        user.save()
+
+        self.authenticate(self.login_credentials)
+
+        shop = self.client.post(self.create_shop_url,self.shop_details)
+
+        self.assertEqual(Product.objects.all().count(),0)
+
+        response = self.client.post(reverse('new_parent_product',kwargs={"id":shop.data['id']}),self.parent_product_details)
+
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
+        self.assertEqual(Product.objects.all().count(),1)
+
     def test_create_product_in_others_shop(self):
         """This test checks if a user can create a product in a shop that's not his'hers
         """

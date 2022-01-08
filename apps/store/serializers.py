@@ -91,6 +91,36 @@ class CreateProductWithoutVariation(serializers.ModelSerializer):
 
         return product
 
+class CreateParentProductSerializer(serializers.ModelSerializer):
+    """This handles a parent product with variants
+
+    Args:
+        serializers ([type]): [description]
+
+    Raises:
+        ValidationError: [description]
+        ValidationError: [description]
+
+    Returns:
+        [type]: [description]
+    """
+    class Meta:
+        model = Product
+        fields = ['name','brand','category','type','description']
+
+    def save(self,shop):
+        product = Product(
+            name = self.validated_data['name'],
+            owner = shop,
+            brand = self.validated_data['brand'],
+            category = self.validated_data['category'],
+            type = self.validated_data['type'],
+            description = self.validated_data['description'],
+        )
+        product.save()
+
+        return product
+
 
     
 class CreateProductSerializers(serializers.ModelSerializer):

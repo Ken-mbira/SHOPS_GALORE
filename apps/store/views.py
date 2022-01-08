@@ -171,6 +171,29 @@ class CreateSingleProductView(APIView):
 
         return Response(data,responseStatus)
 
+class CreateParentProductView(APIView):
+    """this creates a new parent product with variations
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsShopOwner & ShopPermissions]
+
+    @swagger_auto_schema(request_body=CreateParentProductSerializer,responses={200:ProductSerializer()})
+    def post(self,request,id):
+        serializer = CreateParentProductSerializer(data = request.data)
+        if serializer.is_valid():
+            data = ProductSerializer(serializer.save(shop = Shop.objects.get(pk = id))).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
 class CreateProductView(APIView):
     """This creates a new product
 

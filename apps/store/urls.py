@@ -8,6 +8,7 @@ urlpatterns = [
     path("<int:id>/product/",views.ShopProductView.as_view(),name="products"),
     path("delete/<int:id>",views.DeleteShopView.as_view(),name="delete"),
     path("new_single_product/<int:id>",views.CreateSingleProductView.as_view(),name="new_single_product"),
+    path("new_parent_product/<int:id>",views.CreateParentProductView.as_view(),name="new_parent_product"),
     path("brand/",views.BrandView.as_view(),name="brand"),
     path("type/",views.TypeView.as_view(),name="type"),
     path("product/<int:id>",views.SingleProductView.as_view(),name="product"),
