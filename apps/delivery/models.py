@@ -37,6 +37,7 @@ class DeliveryMeans(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name="registered_means")
     means = models.ForeignKey(Means,on_delete=models.PROTECT,related_name="registered_means")
     image = models.ImageField(upload_to="registered_means/",null=True)
+    max_weight = models.DecimalField(max_digits=5,decimal_places=2)
 
     def __str__(self):
         return self.owner.first_name + " - " + self.means.name
