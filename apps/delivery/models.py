@@ -49,7 +49,8 @@ class Destination(models.Model):
         models ([type]): [description]
     """
     means = models.ForeignKey(DeliveryMeans,on_delete=models.CASCADE,related_name="destination")
-    location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="destination_location")
+    location_from = models.ForeignKey(DeliveryMeans,on_delete=models.PROTECT,related_name="from_location")
+    location_to = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="to_location")
     price = models.DecimalField(max_digits=10,decimal_places=2)
 
     def __str__(self):
