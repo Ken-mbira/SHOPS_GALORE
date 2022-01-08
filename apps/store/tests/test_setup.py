@@ -74,7 +74,7 @@ class TestShop(APITestCase):
         self.child_product_details = {
             "price": "12.50",
             "volume":100,
-            "sku":"asdfafdadf",
+            "sku":"",
             "attributes": [
                 "1","2"
             ],

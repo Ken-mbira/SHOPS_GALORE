@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+import uuid
 
 from phonenumber_field.modelfields import PhoneNumberField
 from mptt.models import MPTTModel, TreeForeignKey
@@ -147,7 +148,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
     discount_price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
     volume = models.IntegerField(null=True)
-    sku = models.CharField(max_length=200,null=True,unique=True)
+    sku = models.CharField(max_length=200,null=True,unique=True,blank=True)
     parent = TreeForeignKey(
         "self",
         on_delete=models.PROTECT,related_name="children",
@@ -169,6 +170,11 @@ class Product(models.Model):
         if self.owner.active and Media.objects.filter(product = self).count() > 4:
             return True
         return False
+
+    def save(self,**kwargs):
+        if self.sku is "":
+            self.sku  = uuid.uuid4()
+        super().save()
 
 class Review(models.Model):
     """This stores the customer opinions of the products
