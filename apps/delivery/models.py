@@ -21,7 +21,7 @@ class Means(models.Model):
     Args:
         models ([type]): [description]
     """
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100,unique=True)
     description = models.TextField()
     logo = models.ImageField(upload_to="transport_means/",null=True)
 
