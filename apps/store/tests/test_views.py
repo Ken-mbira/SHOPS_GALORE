@@ -322,7 +322,7 @@ class TestShopViews(TestShop):
 
         self.assertEqual(Product.objects.all().count(),0)
 
-        response = self.client.post(reverse('new_product',kwargs={"id":shop.data['id']}),self.product_details)
+        response = self.client.post(reverse('new_single_product',kwargs={"id":shop.data['id']}),self.single_product_details)
 
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
@@ -367,7 +367,7 @@ class TestShopViews(TestShop):
 
         self.authenticate(other_user_login_credentials)
 
-        response = self.client.post(reverse('new_product',kwargs={"id":shop.pk}),self.product_details)
+        response = self.client.post(reverse('new_single_product',kwargs={"id":shop.pk}),self.single_product_details)
 
         self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
 
@@ -384,7 +384,7 @@ class TestShopViews(TestShop):
 
         shop = self.client.post(self.create_shop_url,self.shop_details)
 
-        response = self.client.post(reverse('new_product',kwargs={"id":shop.data['id']}),self.product_details)
+        response = self.client.post(reverse('new_single_product',kwargs={"id":shop.data['id']}),self.single_product_details)
 
         stock = Stock.objects.get(product = Product.objects.get(pk = response.data['id']))
 

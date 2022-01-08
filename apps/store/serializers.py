@@ -57,6 +57,41 @@ class UpdateShopSerializer(serializers.Serializer):
             return True
         except:
             raise serializers.ValidationError("The object was not found")
+
+class CreateProductWithoutVariation(serializers.ModelSerializer):
+    """This handles creation of a product without any variants
+
+    Args:
+        serializers ([type]): [description]
+
+    Raises:
+        ValidationError: [description]
+        ValidationError: [description]
+
+    Returns:
+        [type]: [description]
+    """
+    class Meta:
+        model = Product
+        fields = ['name','brand','category','type','description','price','volume','sku']
+
+    def save(self,shop):
+        product = Product(
+            name = self.validated_data['name'],
+            owner = shop,
+            brand = self.validated_data['brand'],
+            category = self.validated_data['category'],
+            type = self.validated_data['type'],
+            description = self.validated_data['description'],
+            price = self.validated_data['price'],
+            volume = self.validated_data['volume'],
+            sku = self.validated_data['sku']
+        )
+        product.save()
+
+        return product
+
+
     
 class CreateProductSerializers(serializers.ModelSerializer):
     """This handles the creation of a new product

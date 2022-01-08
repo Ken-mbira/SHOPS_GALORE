@@ -147,7 +147,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
     discount_price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
     volume = models.IntegerField(null=True)
-    sku = models.CharField(max_length=200,null=True)
+    sku = models.CharField(max_length=200,null=True,unique=True)
     parent = TreeForeignKey(
         "self",
         on_delete=models.PROTECT,related_name="children",

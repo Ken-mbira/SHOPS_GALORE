@@ -52,16 +52,15 @@ class TestShop(APITestCase):
             "email_contact": "mbira@ken.com"
         }
 
-        self.product_details = {
+        self.single_product_details = {
             "name": "Mens Leather Jacket",
             "brand": 1,
             "category": 1,
             "type": 1,
             "description": "A leather jacket for men",
             "price": "12.50",
-            "attributes": [
-                "1","2"
-            ]
+            "volume":100,
+            "sku":"asdfafdadf"
         }
         return super().setUp()
 
