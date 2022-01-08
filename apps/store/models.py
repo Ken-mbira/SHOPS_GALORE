@@ -143,9 +143,23 @@ class Product(models.Model):
     added_on = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Shop,on_delete=models.PROTECT,related_name="product")
     attribute_value = models.ManyToManyField(AttributeValue,related_name="product")
-    description = models.TextField()
-    price = models.DecimalField(max_digits=9,decimal_places=2)
-    discount_price = models.DecimalField(null=True,max_digits=9,decimal_places=2)
+    description = models.TextField(null=True,blank=True)
+    price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
+    discount_price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
+    volume = models.IntegerField(null=True)
+    sku = models.CharField(max_length=200,null=True)
+    parent = TreeForeignKey(
+        "self",
+        on_delete=models.PROTECT,related_name="children",
+        null=True,
+        unique=False,
+        blank=True,
+        verbose_name="parent of product",
+        help_text="Format: not required"
+    )
+
+    class MPTTMeta:
+        order_insertion_by = ['added_on']
 
     def __str__(self):
         return self.name
