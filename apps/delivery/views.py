@@ -108,10 +108,10 @@ class CreateDestinationView(APIView):
             [type]: [description]
         """
 
-        means = Means.objects.get(pk = id)
+        means = DeliveryMeans.objects.get(pk = id)
         serializer = DestinationSerializer(data=request.data)
         if serializer.is_valid():
-            destination = serializers.save(means)
+            destination = serializer.save(means)
             data = DestinationSerializer(destination).data
             responseStatus = status.HTTP_200_OK
 

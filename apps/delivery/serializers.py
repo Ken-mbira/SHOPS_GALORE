@@ -1,6 +1,6 @@
 from rest_framework import serializers,status
 
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 
 from apps.account.models import *
 from apps.store.models import *
@@ -120,7 +120,7 @@ class DestinationSerializer(serializers.ModelSerializer):
 
         except Exception as e:
             print(e)
-            raise ValidationError("You have already set such a destination!")
+            raise serializers.ValidationError("You have already set such a destination!")
 
 class DestinationPriceSerializer(serializers.Serializer):
     """This handles updating a destination's price
