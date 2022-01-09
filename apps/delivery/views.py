@@ -170,14 +170,23 @@ class DestinationView(APIView):
     Args:
         APIView ([type]): [description]
     """
-    @swagger_auto_schema(request_body=DestinationPriceSerializer,responses={200:"The destination was successfully updated"})
+    permission_classes = [permissions.IsAuthenticated & IsDeliveryGuy & IsDestinationMeansOwner]
+    @swagger_auto_schema(request_body=DestinationPriceSerializer,responses={200:DestinationSerializer()})
     def put(self,request,id):
+        """This handles updating a destination price
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         destination = Destination.objects.get(pk = id)
 
         serializer = DestinationPriceSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(destination)
-            data = "The destination was successfully updated"
+            data = DestinationSerializer(serializer.save(destination)).data
             responseStatus = status.HTTP_200_OK
 
         else:
@@ -188,6 +197,15 @@ class DestinationView(APIView):
 
     @swagger_auto_schema(responses={200:"The destination was deleted"})
     def delete(self,request,id):
+        """this handles deleting a single destination
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         destination = Destination.objects.get(pk = id)
         destination.delete()
         data = "The destination was deleted"
