@@ -121,6 +121,36 @@ class CreateDestinationView(APIView):
 
         return Response(data,responseStatus)
 
+    @swagger_auto_schema(responses={200:DestinationSerializer()})
+    def get(self,request,id):
+        """This will get all destinations that a particular means has registered
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        destinations = Destination.objects.filter(means = DeliveryMeans.objects.get(pk=id))
+        data = DestinationSerializer(destinations,many=True).data
+        return Response(data,status.HTTP_200_OK)
+
+    @swagger_auto_schema(responses={200:"The delivery means was successfully deleted"})
+    def delete(self,request,id):
+        """This deletes the delivery means
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        means = DeliveryMeans.objects.get(pk=id)
+        means.delete()
+        return Response("The delivery means was successfully deleted",status.HTTP_200_OK)
+
 
 class DestinationView(APIView):
     """This handles a single destination
