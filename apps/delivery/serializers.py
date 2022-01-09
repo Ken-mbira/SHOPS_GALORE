@@ -101,8 +101,8 @@ class DestinationSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Destination
-        fields = ['location_from','location_to','price','means']
-        read_only_fields = ['means']
+        fields = ['location_from','location_to','price','means','id']
+        read_only_fields = ['means','id']
 
     def save(self,means):
         """Handles saving a destination

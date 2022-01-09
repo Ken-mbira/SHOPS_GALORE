@@ -52,6 +52,15 @@ class DeliveryMeansView(APIView):
 
     @swagger_auto_schema(responses={200: RegisterMeansSerializer()})
     def get(self,request,format=None):
+        """This gets all the delivery means that belong to a user
+
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+
+        Returns:
+            [type]: [description]
+        """
         means = DeliveryMeans.objects.filter(owner = request.user)
         data = RegisterMeansSerializer(means,many=True).data
         
@@ -67,6 +76,15 @@ class UpdateMeans(APIView):
 
     @swagger_auto_schema(request_body=DeliveryMeansImage,responses={200:DeliveryMeansImage()})
     def put(self,request,id):
+        """This handles updating the image of a delivery means
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         means = DeliveryMeans.objects.get(pk = id)
         serializer = DeliveryMeansImage(data=request.data)
         if serializer.is_valid():
@@ -80,9 +98,18 @@ class UpdateMeans(APIView):
 
     @swagger_auto_schema(responses={200:"The image was successfully deleted"})
     def delete(self,request,id):
+        """This handles deleting a delivery means
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         means = DeliveryMeans.objects.get(pk=id)
         means.delete()
-        data = "The image was successfully deleted"
+        data = "The delivery means was successfully deleted"
         return Response(data,status.HTTP_200_OK)
 
 class CreateDestinationView(APIView):
@@ -135,21 +162,6 @@ class CreateDestinationView(APIView):
         destinations = Destination.objects.filter(means = DeliveryMeans.objects.get(pk=id))
         data = DestinationSerializer(destinations,many=True).data
         return Response(data,status.HTTP_200_OK)
-
-    @swagger_auto_schema(responses={200:"The delivery means was successfully deleted"})
-    def delete(self,request,id):
-        """This deletes the delivery means
-
-        Args:
-            request ([type]): [description]
-            id ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        means = DeliveryMeans.objects.get(pk=id)
-        means.delete()
-        return Response("The delivery means was successfully deleted",status.HTTP_200_OK)
 
 
 class DestinationView(APIView):
