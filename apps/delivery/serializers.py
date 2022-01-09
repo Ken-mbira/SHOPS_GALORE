@@ -28,12 +28,6 @@ class RecursiveField(serializers.BaseSerializer):
             )
         return instance
 
-
-# class RecursiveField(serializers.Serializer):
-
-#     def to_native(self,value):
-#         return LocationSerializer(value,context = {"parent":self.parent.object, "parent_serializer":self.parent})
-
 class LocationSerializer(serializers.ModelSerializer):
     """This handles the location model
 
@@ -78,8 +72,10 @@ class RegisterMeansSerializer(serializers.ModelSerializer):
             image = self.validated_data['image'],
             max_weight = self.validated_data['max_weight']
         )
-
-        mean.save()
+        try:
+            mean.save()
+        except:
+            raise serializers.ValidationError("You have already registered such means")
         return mean
 
 class DeliveryMeansImage(serializers.Serializer):
@@ -105,11 +101,11 @@ class DestinationSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Destination
-        feilds = ['location_from','location_to','price','means']
+        fields = ['location_from','location_to','price','means']
         read_only_fields = ['means']
 
     def save(self,means):
-        """Handles saving a means
+        """Handles saving a destination
 
         Args:
             means ([type]): [description]

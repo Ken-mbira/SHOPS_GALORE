@@ -22,6 +22,19 @@ class TestDelivery(APITestCase):
 
         self.motorbike_means = Means.objects.create(name="motorbike",description="small vehicle")
 
+        self.user_data = {
+            "password":"1234",
+            "first_name":"Marko",
+            "last_name":"Awan",
+            "email":"awan@gmail.com",
+            "role":3
+        }
+
+        self.login_credentials = {
+            "email":"awan@gmail.com",
+            "password":"1234"
+        }
+
         return super().setUp()
 
     def tearDown(self):
