@@ -52,7 +52,7 @@ class ShopProductView(APIView):
         [type]: [description]
     """
     permission_classes = [permissions.IsAuthenticated & IsShopOwner]
-    @swagger_auto_schema(responses={200:ShopSerializer()})
+    @swagger_auto_schema(responses={200:"Returns Product list"})
     def get(self,request,id):
         """This returns all the products in a shop
 
@@ -63,7 +63,7 @@ class ShopProductView(APIView):
         Returns:
             [type]: [description]
         """
-        data = ProductSerializer(Product.objects.filter(owner =  Shop.objects.get(pk = id)),many=True).data
+        data = GetProductSerializer(Product.objects.filter(owner =  Shop.objects.get(pk = id)),many=True).data
         return Response(data,status.HTTP_200_OK)
 
 
@@ -284,7 +284,7 @@ class SingleProductView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsProductOwner]
 
-    @swagger_auto_schema(responses={200: GetProductSerializer()})
+    @swagger_auto_schema(responses={200:"Returns product instance"})
     def get(self,request,id):
         product = Product.objects.get(pk = id)
         data = GetProductSerializer(product).data
@@ -352,7 +352,7 @@ class UpdateDefaultImage(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsProductOwner]
 
-    @swagger_auto_schema(request_body=DefaultImageSerializer,responses={200: GetProductSerializer()})
+    @swagger_auto_schema(request_body=DefaultImageSerializer,responses={200: "Returns product instance"})
     def post(self,request,id):
         product = Product.objects.get(pk = id)
 
@@ -423,3 +423,23 @@ class ReviewView(APIView):
 
         review.delete()
         return Response("The review was deleted",status.HTTP_200_OK)
+
+
+class CategoryView(APIView):
+    """This handles the categories
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self,request,format=None):
+        """This lists all the categories out
+
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+        """
+        categories = Category.objects.filter(level=0)
+        data = GetCategorySerializer(categories,many=True).data
+        return Response(data,status.HTTP_200_OK)

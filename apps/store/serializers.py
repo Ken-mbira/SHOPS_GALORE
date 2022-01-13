@@ -4,6 +4,7 @@ from django.db.models.fields import IntegerField
 from rest_framework import serializers
 
 from apps.store.models import *
+from apps.delivery.serializers import RecursiveField
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -296,6 +297,10 @@ class GetProductSerializer(serializers.ModelSerializer):
     Args:
         serializers ([type]): [description]
     """
+    def __init__(self, *args, depth=0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.depth = depth
+
     product_images = ProductImagesSerializer(many=True)
     owner = ShopSerializer()
     stock = StockSerializer()
@@ -318,6 +323,12 @@ class GetProductSerializer(serializers.ModelSerializer):
             'stock',
             'product_images'
         ]
+
+    def get_fields(self):
+        fields = super(GetProductSerializer,self).get_fields()
+        if self.depth !=1:
+            fields['children'] = GetProductSerializer(many=True,required=False)
+        return fields
 
 class DefaultImageSerializer(serializers.Serializer):
     image = serializers.CharField(required=True)
@@ -353,3 +364,26 @@ class ReviewSerializer(serializers.ModelSerializer):
 
         review.save()
         return review
+
+class GetCategorySerializer(serializers.ModelSerializer):
+    """This handles the categories when its a get request
+
+    Args:
+        serializers ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    def __init__(self, *args, depth=0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.depth = depth
+
+    class Meta:
+        model = Location
+        fields = ['id','name']
+
+    def get_fields(self):
+        fields = super(GetCategorySerializer,self).get_fields()
+        if self.depth !=1:
+            fields['children'] = GetCategorySerializer(many=True,required=False)
+        return fields

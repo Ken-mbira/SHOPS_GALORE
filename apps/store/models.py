@@ -147,7 +147,7 @@ class Product(models.Model):
     description = models.TextField(null=True,blank=True)
     price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
     discount_price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
-    volume = models.IntegerField(null=True)
+    volume = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True)
     weight = models.DecimalField(max_digits=5,decimal_places=2,verbose_name="Weight in kilograms",null=True,blank=True)
     sku = models.CharField(max_length=200,null=True,unique=True,blank=True)
     parent = TreeForeignKey(
