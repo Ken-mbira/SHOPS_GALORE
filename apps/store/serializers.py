@@ -307,9 +307,11 @@ class GetProductSerializer(serializers.ModelSerializer):
     brand = BrandSerializer()
     category = CategorySerializer()
     attribute_value = AttributeValueSerializer(many=True)
+    type = TypeSerializer()
     class Meta:
         model = Product
         fields = [
+            'id',
             'name',
             'brand',
             'category',
@@ -321,13 +323,18 @@ class GetProductSerializer(serializers.ModelSerializer):
             'price',
             'discount_price',
             'stock',
-            'product_images'
+            'product_images',
+            'parent',
+            'sku',
+            'volume',
+            'weight'
         ]
 
     def get_fields(self):
         fields = super(GetProductSerializer,self).get_fields()
         if self.depth !=1:
             fields['children'] = GetProductSerializer(many=True,required=False)
+
         return fields
 
 class DefaultImageSerializer(serializers.Serializer):
