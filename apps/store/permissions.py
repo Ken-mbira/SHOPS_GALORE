@@ -35,7 +35,19 @@ class IsProductOwner(permissions.BasePermission):
         except:
             raise NotFound()
 
-        
+class IsImageProductOwner(permissions.BasePermission):
+    """
+    This only allows owners of a product to change its images
+    """
+    def has_permission(self, request, view):
+        try:
+            image = Media.objects.get(pk = view.kwargs['id'])
+            if image.product.owner.owner == request.user:
+                return True
+            return False
+        except:
+            raise NotFound()
+            
 class ShopPermissions(permissions.BasePermission):
     """This handles the permissions for handling a shop instance
 

@@ -365,6 +365,23 @@ class UpdateDefaultImage(APIView):
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
 
+class ImageView(APIView):
+    """Handles deletion of an image
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    def delete(self,request,id):
+        """Deletes the image"""
+
+        image = Media.objects.get(pk = id)
+        image.delete()
+
+        return Response("The image was deleted successfully!",status.HTTP_200_OK)
+
 class AttributeFilterView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
