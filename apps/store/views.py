@@ -42,6 +42,31 @@ class RegisterShopView(APIView):
 
         return Response(data,responseStatus)
 
+class ShopProductView(APIView):
+    """This handles the products from a single shop
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsShopOwner]
+    @swagger_auto_schema(responses={200:"Returns Product list"})
+    def get(self,request,id):
+        """This returns all the products in a shop
+
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+
+        Returns:
+            [type]: [description]
+        """
+        data = GetProductSerializer(Product.objects.filter(owner =  Shop.objects.get(pk = id)),many=True).data
+        return Response(data,status.HTTP_200_OK)
+
+
 class UpdateShopView(APIView):
     """This handles requests to alter the shop instances
 
@@ -49,6 +74,26 @@ class UpdateShopView(APIView):
         APIView ([type]): [description]
     """
     permission_classes = [permissions.IsAuthenticated & IsShopOwner]
+
+    @swagger_auto_schema(responses={200:ShopSerializer})
+    def get(self,request,id):
+        """This returns a single shop instance
+
+        Args:
+            request ([type]): [description]
+            id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        try:
+            instance = Shop.objects.get(pk = id)
+            data = ShopSerializer(instance).data
+            return Response(data,status.HTTP_200_OK)
+        
+        except:
+            return Response("The shop was not found",status.HTTP_404_NOT_FOUND)
+
 
     @swagger_auto_schema(request_body=ShopSerializer,responses={200:ShopSerializer})
     def put(self,request,id):
@@ -102,6 +147,75 @@ class DeleteShopView(APIView):
         shop.delete()
 
         return Response("The shop was deleted successfully",status.HTTP_200_OK)
+
+class CreateSingleProductView(APIView):
+    """this creates a new product without variations
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsShopOwner & ShopPermissions]
+
+    @swagger_auto_schema(request_body=CreateProductWithoutVariation,responses={200:ProductSerializer()})
+    def post(self,request,id):
+        serializer = CreateProductWithoutVariation(data = request.data)
+        if serializer.is_valid():
+            data = ProductSerializer(serializer.save(shop = Shop.objects.get(pk = id))).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+class CreateParentProductView(APIView):
+    """this creates a new parent product with variations
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsShopOwner & ShopPermissions]
+
+    @swagger_auto_schema(request_body=CreateParentProductSerializer,responses={200:ProductSerializer()})
+    def post(self,request,id):
+        serializer = CreateParentProductSerializer(data = request.data)
+        if serializer.is_valid():
+            data = ProductSerializer(serializer.save(shop = Shop.objects.get(pk = id))).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+class CreateChildProductView(APIView):
+    """This handles the child of a product
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    permission_classes = [permissions.IsAuthenticated & IsShopOwner & ShopPermissions]
+
+    @swagger_auto_schema(request_body=CreateChildProductSerializer,responses={200:ProductSerializer()})
+    def post(self,request,id):
+        serializer = CreateChildProductSerializer(data = request.data)
+        if serializer.is_valid():
+            data = ProductSerializer(serializer.save(shop = Shop.objects.get(pk = id))).data
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
 
 class CreateProductView(APIView):
     """This creates a new product
@@ -170,7 +284,7 @@ class SingleProductView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsProductOwner]
 
-    @swagger_auto_schema(responses={200: GetProductSerializer()})
+    @swagger_auto_schema(responses={200:"Returns product instance"})
     def get(self,request,id):
         product = Product.objects.get(pk = id)
         data = GetProductSerializer(product).data
@@ -238,18 +352,35 @@ class UpdateDefaultImage(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsProductOwner]
 
-    @swagger_auto_schema(request_body=DefaultImageSerializer,responses={200: GetProductSerializer()})
+    @swagger_auto_schema(request_body=DefaultImageSerializer,responses={200: ProductImagesSerializer()})
     def post(self,request,id):
         product = Product.objects.get(pk = id)
 
         serializer = DefaultImageSerializer(data=request.data)
         if serializer.is_valid():
-            data = GetProductSerializer(serializer.make_featured(product)).data
+            data = ProductImagesSerializer(serializer.make_featured(product)).data
             responseStatus = status.HTTP_200_OK
         else:
             data = serializer.errors
             responseStatus = status.HTTP_400_BAD_REQUEST
         return Response(data,responseStatus)
+
+class ImageView(APIView):
+    """Handles deletion of an image
+
+    Args:
+        APIView ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    def delete(self,request,id):
+        """Deletes the image"""
+
+        image = Media.objects.get(pk = id)
+        image.delete()
+
+        return Response("The image was deleted successfully!",status.HTTP_200_OK)
 
 class AttributeFilterView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -309,3 +440,23 @@ class ReviewView(APIView):
 
         review.delete()
         return Response("The review was deleted",status.HTTP_200_OK)
+
+
+class CategoryView(APIView):
+    """This handles the categories
+
+    Args:
+        APIView ([type]): [description]
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self,request,format=None):
+        """This lists all the categories out
+
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+        """
+        categories = Category.objects.filter(level=0)
+        data = GetCategorySerializer(categories,many=True).data
+        return Response(data,status.HTTP_200_OK)
