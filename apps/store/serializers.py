@@ -354,7 +354,7 @@ class DefaultImageSerializer(serializers.Serializer):
                 
         image.is_default = True
         image.save()
-        return image.product    
+        return image 
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

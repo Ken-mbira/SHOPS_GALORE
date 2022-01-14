@@ -352,13 +352,13 @@ class UpdateDefaultImage(APIView):
     """
     permission_classes = [permissions.IsAuthenticated & IsProductOwner]
 
-    @swagger_auto_schema(request_body=DefaultImageSerializer,responses={200: "Returns product instance"})
+    @swagger_auto_schema(request_body=DefaultImageSerializer,responses={200: ProductImagesSerializer()})
     def post(self,request,id):
         product = Product.objects.get(pk = id)
 
         serializer = DefaultImageSerializer(data=request.data)
         if serializer.is_valid():
-            data = GetProductSerializer(serializer.make_featured(product)).data
+            data = ProductImagesSerializer(serializer.make_featured(product)).data
             responseStatus = status.HTTP_200_OK
         else:
             data = serializer.errors
