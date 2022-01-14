@@ -17,6 +17,24 @@ class TestDelivery(APITestCase):
             Role.objects.create(name="delivery")
             Role.objects.create(name="customer")
 
+        self.parent_location = Location.objects.create(name="Kajiado")
+        self.location = Location.objects.create(name="Kiserian",parent = self.parent_location)
+
+        self.motorbike_means = Means.objects.create(name="motorbike",description="small vehicle")
+
+        self.user_data = {
+            "password":"1234",
+            "first_name":"Marko",
+            "last_name":"Awan",
+            "email":"awan@gmail.com",
+            "role":3
+        }
+
+        self.login_credentials = {
+            "email":"awan@gmail.com",
+            "password":"1234"
+        }
+
         return super().setUp()
 
     def tearDown(self):
