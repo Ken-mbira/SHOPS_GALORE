@@ -173,7 +173,7 @@ class Product(models.Model):
         return False
 
     def save(self,**kwargs):
-        if self.sku is "":
+        if self.sku == "":
             self.sku  = uuid.uuid4()
         super().save()
 
