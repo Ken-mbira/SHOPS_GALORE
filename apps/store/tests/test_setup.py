@@ -52,17 +52,37 @@ class TestShop(APITestCase):
             "email_contact": "mbira@ken.com"
         }
 
-        self.product_details = {
+        self.single_product_details = {
             "name": "Mens Leather Jacket",
             "brand": 1,
             "category": 1,
             "type": 1,
             "description": "A leather jacket for men",
             "price": "12.50",
+            "volume":100,
+            "sku":"asdfafdadf",
+            "weight":10
+        }
+
+        self.parent_product_details = {
+            "name": "Mens Leather Jacket",
+            "brand": 1,
+            "category": 1,
+            "type": 1,
+            "description": "A leather jacket for men"
+        }
+
+        self.child_product_details = {
+            "price": "12.50",
+            "volume":100,
+            "sku":"",
             "attributes": [
                 "1","2"
-            ]
+            ],
+            "parent":1,
+            "weight":10
         }
+
         return super().setUp()
 
     def tearDown(self):
