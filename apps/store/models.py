@@ -172,6 +172,14 @@ class Product(models.Model):
             return True
         return False
 
+    @property
+    def featured_image(self):
+        for image in Media.objects.filter(product = self):
+            if image.is_default:
+                return image
+            continue
+        return None
+
     def save(self,**kwargs):
         if self.sku == "":
             self.sku  = uuid.uuid4()
