@@ -308,6 +308,7 @@ class GetProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     attribute_value = AttributeValueSerializer(many=True)
     type = TypeSerializer()
+    featured_image = ProductImagesSerializer()
     class Meta:
         model = Product
         fields = [
@@ -327,7 +328,8 @@ class GetProductSerializer(serializers.ModelSerializer):
             'parent',
             'sku',
             'volume',
-            'weight'
+            'weight',
+            'featured_image',
         ]
 
     def get_fields(self):
