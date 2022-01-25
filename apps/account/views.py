@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from apps.account.tokens import account_activation_token
-from apps.account.permissions import *
 
+from apps.account.permissions import *
 from apps.account.serializers import *
 from apps.account.models import *
 
@@ -265,12 +265,13 @@ class RegisterStaffView(APIView):
 
 class GoogleSingUpView(APIView):
 
-    @swagger_auto_schema(request_body=GoogleSignUpSerializer(),responses={200:GetUserSerializer()})
+    @swagger_auto_schema(request_body=GoogleSignUpSerializer(),responses={"Refresh and Access Tokens"})
     def post(self,request):
         serializer = GoogleSignUpSerializer(data = request.data)
 
         if serializer.is_valid() and serializer.validate_user_role():
-            data = GetUserSerializer(serializer.validate_google_auth_token()).data
+            user = serializer.validate_google_auth_token()
+            data = user.tokens()
             responseStatus = status.HTTP_200_OK
         else:
             data = serializer.errors

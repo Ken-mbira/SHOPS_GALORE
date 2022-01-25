@@ -227,6 +227,7 @@ class GoogleSignUpSerializer(serializers.Serializer):
 
             user.set_password(config('SOCIAL_PASSWORD'))
             user.save()
+            return User.objects.get(email = user_data['email'])
 
         except:
             raise serializers.ValidationError("The user is already registered")
