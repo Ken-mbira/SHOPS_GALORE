@@ -67,3 +67,9 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     )
     msg.attach_alternative(email_html_message, "text/html")
     msg.send()
+
+try:
+    for user in User.objects.all():
+        user.auth_provider = "email"
+except:
+    print("Oh well")
