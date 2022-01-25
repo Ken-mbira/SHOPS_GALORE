@@ -1,3 +1,4 @@
+from multiprocessing import AuthenticationError
 from django.forms import ValidationError
 from rest_framework import serializers
 from django.contrib.auth import authenticate
@@ -210,6 +211,9 @@ class GoogleSignUpSerializer(serializers.Serializer):
             user_data['sub']
         except Exception as e:
             raise serializers.ValidationError("The token is either invalid or expired")
+
+        if user_data['aud'] != config("GOOGLE_CLIENT_ID"):
+            raise AuthenticationError("You are not allowed to perform this action!")
 
         try:
 
