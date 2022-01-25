@@ -1,3 +1,4 @@
+from django.http import response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions
@@ -255,6 +256,21 @@ class RegisterStaffView(APIView):
         if serializer.is_valid():
             serializer.save(request)
             data = "The staff member was created successfully"
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+class GoogleSingUpView(APIView):
+
+    @swagger_auto_schema(request_body=GoogleSignUpSerializer(),responses={200:GetUserSerializer()})
+    def post(self,request):
+        serializer = GoogleSignUpSerializer(data = request.data)
+
+        if serializer.is_valid() and serializer.validate_user_role():
+            data = GetUserSerializer(serializer.validate_google_auth_token()).data
             responseStatus = status.HTTP_200_OK
         else:
             data = serializer.errors

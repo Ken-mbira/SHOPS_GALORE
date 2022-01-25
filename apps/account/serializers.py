@@ -1,11 +1,14 @@
+from django.forms import ValidationError
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.sites.shortcuts import get_current_site
 from phonenumber_field.modelfields import PhoneNumberField
+from decouple import config
 
 from apps.account.models import *
 from apps.account.emails import send_account_activation_email
 from apps.storage.models import *
+from apps.account import google
 
 class RegisterSerializer(serializers.ModelSerializer):
     """This defines the fields involved in creation of a user
@@ -174,3 +177,52 @@ class AccountStatusSerializer(serializers.Serializer):
         """
         user = User.objects.get(pk = self.validated_data['user'])
         user.reinstate()
+
+
+class GoogleSignUpSerializer(serializers.Serializer):
+    """This handles a signup with google attempt
+
+    Args:
+        serializers ([type]): [description]
+    """
+
+    auth_token = serializers.CharField()
+    role = serializers.CharField()
+
+    def validate_user_role(self):
+        """This handle authenticating the role sent
+
+        Raises:
+            ValidationError: [description]
+        """
+        try:
+            role = Role.objects.get(pk = int(self.validated_data['role']))
+            return True
+        except Role.DoesNotExist:
+            raise serializers.ValidationError("The chosen role does not exist")
+
+    def validate_google_auth_token(self):
+        """This handles the actual loggin in
+        """
+        user_data = google.Google.validate(self.validated_data['auth_token'])
+
+        try:
+            user_data['sub']
+        except Exception as e:
+            raise serializers.ValidationError("The token is either invalid or expired")
+
+        try:
+
+            user = User.objects.create(
+                email = user_data['email'],
+                role = Role.objects.get(pk = self.validated_data['role']),
+                first_name = user_data['given_name'],
+                last_name = user_data['family_name'],
+                auth_provider = AUTH_PROVIDERS.get("google")
+            )
+
+            user.set_password(config('SOCIAL_PASSWORD'))
+            user.save()
+
+        except:
+            raise serializers.ValidationError("The user is already registered")

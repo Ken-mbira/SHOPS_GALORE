@@ -16,4 +16,5 @@ urlpatterns = [
     path('reinstate/',views.ReinstateAccount.as_view(),name="reinstate"),
     path("new_staff/",views.RegisterStaffView.as_view(),name="new_staff"),
     path("roles/",views.RolesView.as_view(),name="roles"),
+    path("google_signup/",views.GoogleSingUpView.as_view(),name="google_signup"),
 ]
