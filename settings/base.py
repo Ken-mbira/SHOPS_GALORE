@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'apps.storage',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
+    'rest_framework_simplejwt.token_blacklist',
     'mptt',
     'corsheaders',
 ]
