@@ -265,7 +265,7 @@ class RegisterStaffView(APIView):
 
 class GoogleSingUpView(APIView):
 
-    @swagger_auto_schema(request_body=GoogleSignUpSerializer(),responses={"Refresh and Access Tokens"})
+    @swagger_auto_schema(request_body=GoogleSignUpSerializer(),responses={200:"Refresh and Access Tokens"})
     def post(self,request):
         serializer = GoogleSignUpSerializer(data = request.data)
 
