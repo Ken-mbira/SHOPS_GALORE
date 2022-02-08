@@ -18,5 +18,5 @@ class Google:
             if 'accounts.google.com' in user_information['iss']:
                 return user_information
 
-        except:
+        except Exception as e:
             return "The token is either invalid or expired"

@@ -265,12 +265,28 @@ class RegisterStaffView(APIView):
 
 class GoogleSingUpView(APIView):
 
-    @swagger_auto_schema(request_body=GoogleSignUpSerializer(),responses={200:"Refresh and Access Tokens"})
+    @swagger_auto_schema(request_body=SocialSignUpSerializer(),responses={200:"Refresh and Access Tokens"})
     def post(self,request):
-        serializer = GoogleSignUpSerializer(data = request.data)
+        serializer = SocialSignUpSerializer(data = request.data)
 
         if serializer.is_valid() and serializer.validate_user_role():
             user = serializer.validate_google_auth_token()
+            data = user.tokens()
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+class FacebookSingUpView(APIView):
+
+    @swagger_auto_schema(request_body=SocialSignUpSerializer(),responses={200:"Refresh and Access Tokens"})
+    def post(self,request):
+        serializer = SocialSignUpSerializer(data = request.data)
+
+        if serializer.is_valid() and serializer.validate_user_role():
+            user = serializer.validate_facebook_auth_token()
             data = user.tokens()
             responseStatus = status.HTTP_200_OK
         else:

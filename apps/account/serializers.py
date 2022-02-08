@@ -10,6 +10,8 @@ from apps.account.models import *
 from apps.account.emails import send_account_activation_email
 from apps.storage.models import *
 from apps.account import google
+from apps.account import facebook
+from apps.account import register
 
 class RegisterSerializer(serializers.ModelSerializer):
     """This defines the fields involved in creation of a user
@@ -180,7 +182,7 @@ class AccountStatusSerializer(serializers.Serializer):
         user.reinstate()
 
 
-class GoogleSignUpSerializer(serializers.Serializer):
+class SocialSignUpSerializer(serializers.Serializer):
     """This handles a signup with google attempt
 
     Args:
@@ -202,8 +204,26 @@ class GoogleSignUpSerializer(serializers.Serializer):
         except Role.DoesNotExist:
             raise serializers.ValidationError("The chosen role does not exist")
 
+    def validate_facebook_auth_token(self):
+        """This handles a user signup request using facebook
+        """
+        user_data = facebook.Facebook.validate(self.validated_data['auth_token'])
+
+        provider = AUTH_PROVIDERS.get("facebook")
+        role = Role.objects.get(pk = self.validated_data['role'])
+
+        try:
+            return register.register_social_user(user_data['email'],user_data['first_name'],user_data['last_name'],role,provider)
+
+        except Exception as e:
+            print(e)
+            provider = User.objects.get(email = user_data['email']).auth_provider
+            raise serializers.ValidationError(f"""The user is already registered, please proceed to login with {provider}""")
+
+
     def validate_google_auth_token(self):
         """This handles the actual loggin in
+
         """
         user_data = google.Google.validate(self.validated_data['auth_token'])
 
@@ -229,6 +249,6 @@ class GoogleSignUpSerializer(serializers.Serializer):
             user.save()
             return User.objects.get(email = user_data['email'])
 
-        except Exception:
+        except Exception as e:
             provider = User.objects.get(email = user_data['email']).auth_provider
             raise serializers.ValidationError(f"""The user is already registered, please proceed to login with {provider}""")
