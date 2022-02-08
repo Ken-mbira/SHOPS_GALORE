@@ -229,5 +229,6 @@ class GoogleSignUpSerializer(serializers.Serializer):
             user.save()
             return User.objects.get(email = user_data['email'])
 
-        except:
-            raise serializers.ValidationError("The user is already registered")
+        except Exception:
+            provider = User.objects.get(email = user_data['email']).auth_provider
+            raise serializers.ValidationError(f"""The user is already registered, please proceed to login with {provider}""")
