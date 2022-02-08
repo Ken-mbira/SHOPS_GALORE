@@ -23,6 +23,7 @@ django-rest-passwordreset==1.2.1
 djangorestframework==3.12.4
 djangorestframework-simplejwt==5.0.0
 drf-yasg==1.20.0
+facebook-sdk==3.1.0
 google-api-core==2.4.0
 google-api-python-client==2.36.0
 google-auth==2.4.1

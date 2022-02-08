@@ -18,7 +18,6 @@ except Exception as e:
 def create_associate_tables(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
-        Token.objects.create(user=instance)
         if instance.role.name == "staff":
             StaffProfile.objects.create(user = instance)
 
@@ -67,9 +66,3 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     )
     msg.attach_alternative(email_html_message, "text/html")
     msg.send()
-
-try:
-    for user in User.objects.all():
-        user.auth_provider = "email"
-except:
-    print("Oh well")
