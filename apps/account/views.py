@@ -294,3 +294,33 @@ class FacebookSingUpView(APIView):
             responseStatus = status.HTTP_400_BAD_REQUEST
 
         return Response(data,responseStatus)
+
+class GoogleLoginView(APIView):
+
+    def post(self,request):
+        serializer = SocialLoginSerializer(data = request.data)
+
+        if serializer.is_valid():
+            user = serializer.google_social_login()
+            data = user.tokens()
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)
+
+class FacebookLoginView(APIView):
+
+    def post(self,request):
+        serializer = SocialLoginSerializer(data = request.data)
+
+        if serializer.is_valid():
+            user = serializer.facebook_social_login()
+            data = user.tokens()
+            responseStatus = status.HTTP_200_OK
+        else:
+            data = serializer.errors
+            responseStatus = status.HTTP_400_BAD_REQUEST
+
+        return Response(data,responseStatus)

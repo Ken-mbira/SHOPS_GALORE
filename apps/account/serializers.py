@@ -181,6 +181,65 @@ class AccountStatusSerializer(serializers.Serializer):
         user = User.objects.get(pk = self.validated_data['user'])
         user.reinstate()
 
+class SocialLoginSerializer(serializers.Serializer):
+    """This handles the user logging in with one of the social login methods
+
+    Args:
+        serializers ([type]): [description]
+
+    Raises:
+        serializers.ValidationError: [description]
+        serializers.ValidationError: [description]
+        serializers.ValidationError: [description]
+        AuthenticationError: [description]
+        serializers.ValidationError: [description]
+
+    Returns:
+        [type]: [description]
+    """
+    auth_token = serializers.CharField()
+
+    def google_social_login(self):
+        """Thsi handles a login attempt with google as the provider
+
+        Returns:
+            [type]: [description]
+        """
+
+        provider = AUTH_PROVIDERS.get("google")
+        user_data = google.Google.validate(self.validated_data['auth_token'])
+
+        try:
+            user_data['sub']
+        except Exception as e:
+            raise serializers.ValidationError("The token is either invalid or expired")
+
+        if user_data['aud'] != config("GOOGLE_CLIENT_ID"):
+            raise AuthenticationError("You are not allowed to perform this action!")
+
+        try:
+            user = register.HandleSocialUser.login_social_user(user_data['email'],provider)
+            return user
+
+        except Exception as e:
+            raise serializers.ValidationError(e)
+
+    def facebook_social_login(self):
+        """This handles login via facebook
+
+        Returns:
+            [type]: [description]
+        """
+        provider = AUTH_PROVIDERS.get("facebook")
+        user_data = facebook.Facebook.validate(self.validated_data['auth_token'])
+
+        try:
+            return register.HandleSocialUser.login_social_user(user_data['email'],provider)
+
+        except Exception as e:
+            raise serializers.ValidationError(e)
+
+
 
 class SocialSignUpSerializer(serializers.Serializer):
     """This handles a signup with google attempt
