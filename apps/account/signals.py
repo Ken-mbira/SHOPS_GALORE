@@ -18,7 +18,6 @@ except Exception as e:
 def create_associate_tables(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
-        Token.objects.create(user=instance)
         if instance.role.name == "staff":
             StaffProfile.objects.create(user = instance)
 
