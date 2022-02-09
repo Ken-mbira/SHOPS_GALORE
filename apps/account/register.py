@@ -16,7 +16,7 @@ def register_social_user(email,first_name,last_name,role,auth_provider):
     user.set_password(config('SOCIAL_PASSWORD'))
     user.save()
     return User.objects.get(email = email)
-# test
+
 class HandleSocialUser:
 
     def login_social_user(email,provider):

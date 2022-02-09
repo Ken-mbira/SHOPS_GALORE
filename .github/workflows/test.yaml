@@ -21,6 +21,10 @@ on:
         required: true
       EMAIL_HOST_PASSWORD:
         required: true
+      SOCIAL_PASSWORD:
+        required: true
+      GOOGLE_CLIENT_ID:
+        required: true
 
 jobs:
   build:
