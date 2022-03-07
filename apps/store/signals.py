@@ -7,4 +7,4 @@ from django.conf import settings
 @receiver(post_save, sender=Product)
 def create_stock_table(sender, instance, created, **kwargs):
     if created:
-        Stock.objects.create(product = instance,count=0,last_stock_check_date = datetime.now())
+        Stock.objects.create(product = instance,last_stock_check_date = datetime.now())
