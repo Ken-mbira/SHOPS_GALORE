@@ -75,7 +75,7 @@ class Type(models.Model):
         models ([type]): [description]
     """
     name = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(null=True,blank=True)
 
     def __str__(self):
         return self.name
@@ -142,10 +142,10 @@ class Product(models.Model):
             continue
         return None
 
-    def save(self,**kwargs):
-        if self.sku == "":
-            self.sku  = uuid.uuid4()
-        super().save()
+    # def save(self,**kwargs):
+    #     if self.sku == "":
+    #         self.sku  = uuid.uuid4()
+    #     super().save()
 
 class Review(models.Model):
     """This stores the customer opinions of the products

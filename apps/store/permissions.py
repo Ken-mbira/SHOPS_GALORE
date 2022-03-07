@@ -3,7 +3,7 @@ from rest_framework.exceptions import APIException
 
 from apps.store.models import *
 
-class IsShopOwner(permissions.BasePermission):
+class IsStoreOwner(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.role == "STORE_OWNER"
 
