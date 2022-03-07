@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
+from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.store.models import *
 from apps.store.serializers import *
@@ -13,6 +14,8 @@ from apps.store.permissions import *
 class StoreShopListView(generics.ListCreateAPIView):
     serializer_class = StoreShopSerializer
     permission_classes = [permissions.IsAuthenticated & IsStoreOwner]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['active']
 
     def get_queryset(self):
         return Shop.objects.filter(owner=self.request.user)
