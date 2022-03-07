@@ -38,7 +38,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", schema_view.with_ui('redoc',cache_timeout=0), name='schema-redoc'),
     path("account/",include('apps.account.urls')),
-    path("shop/",include("apps.store.urls")),
+    path("store/",include("apps.store.urls")),
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path("delivery/",include('apps.delivery.urls')),

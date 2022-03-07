@@ -21,15 +21,18 @@ class Shop(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,editable=False)
     owner = models.ForeignKey(User,on_delete=models.PROTECT,related_name="shops")
     logo = models.ImageField(upload_to="store_profiles/",null=True)
-    pickup_location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="shop")
-    phone_contact = PhoneNumberField(region="KE")
+    # pickup_location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="shop")
+    phone_contact = PhoneNumberField()
     email_contact = models.EmailField()
-    subscription_end_date = models.DateField(null=True)
     active = models.BooleanField(default=True)
 
 
     def __str__(self):
         return self.name
+
+    @property
+    def product_count(self):
+        return Product.objects.filter(owner = self,active=True).count()
 
     def deactivate(self):
         self.active = False
@@ -123,6 +126,7 @@ class Product(models.Model):
     volume = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True,verbose_name="Volume in m3")
     weight = models.DecimalField(max_digits=5,decimal_places=2,verbose_name="Weight in kilograms",null=True,blank=True)
     parent = TreeForeignKey("self",on_delete=models.PROTECT,related_name="children",null=True,unique=False,blank=True,verbose_name="parent of product",)
+    active = models.BooleanField(default=False)
 
     class MPTTMeta:
         order_insertion_by = ['added_on']

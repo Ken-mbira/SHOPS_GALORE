@@ -126,7 +126,7 @@ class Profile(models.Model):
         models ([type]): [description]
     """
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
-    phone_number = PhoneNumberField(region="KE")
+    phone_number = PhoneNumberField()
     bio = models.TextField()
     location = models.CharField(max_length=50)
     avatar = models.ImageField(upload_to="profiles/")
