@@ -35,8 +35,8 @@ class CheckRole(permissions.BasePermission):
         permissions ([type]): [description]
     """
     def has_permission(self, request, view):
-        if request.data['role'] == "1":
-            return False
+        if request.data['role'] == "STAFF":
+            raise StaffRegistration
         return True
 
 class CheckRegisterNewStaff(permissions.BasePermission):
@@ -60,3 +60,7 @@ class StorageNotFound(APIException):
     status_code = status.HTTP_404_NOT_FOUND
     default_detail = {"error":True,"message":"What you are looking for was not found"}
     default_code = "not found"
+
+class StaffRegistration(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = {"error":"A staff member cannot register using this means"}

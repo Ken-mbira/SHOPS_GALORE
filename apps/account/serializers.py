@@ -22,14 +22,15 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password','email','role','first_name','last_name']
+        extra_kwargs = {
+            "password":{"write_only":True}
+        }
 
-    def save(self,request):
-        user = User(first_name = self.validated_data['first_name'], last_name=self.validated_data['last_name'],email=self.validated_data['email'],role=self.validated_data['role'])
-        user.set_password(self.validated_data['password'])
-        user.is_active = False
+    def create(self,validated_data):
+        password = validated_data.pop("password")
+        user = User.objects.create(**validated_data)
+        user.set_password(password)
         user.save()
-        current_site = get_current_site(request)
-        send_account_activation_email(current_site,user)
         return user
 
 class RegisterStaffSerializer(serializers.ModelSerializer):
