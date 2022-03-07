@@ -29,33 +29,33 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-class ProfileSerializer(serializers.ModelSerializer):
+class AccountProfileSerializer(serializers.ModelSerializer):
     """This serializes the profile model
 
     Args:
         serializers ([type]): [description]
     """
-    phone_number = PhoneNumberField(region="KE")
     class Meta:
         model = Profile
         fields = '__all__'
-        read_only_fields = ['user','avatar','gender','receive_notifications_via_email']
+        read_only_fields = ['user']
 
-    def update(self,instance):
+    def update(self,instance,validated_data):
 
-        instance.phone_number = self.validated_data['phone_number']
-        instance.bio = self.validated_data['bio']
-        instance.location = self.validated_data['location']
+        instance.phone_number = validated_data['phone_number']
+        instance.bio = validated_data['bio']
+        instance.location = validated_data['location']
+        instance.avatar = validated_data['avatar']
         instance.save()
         return instance
 
-class GetUserSerializer(serializers.ModelSerializer):
+class AccountUserSerializer(serializers.ModelSerializer):
     """This deals with getting a user instance
 
     Args:
         serializers ([type]): [description]
     """
-    profile = ProfileSerializer()
+    profile = AccountProfileSerializer()
     class Meta:
         model = User
         fields = ['email','role','first_name','last_name','member_since','profile']

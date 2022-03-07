@@ -4,7 +4,8 @@ from apps.account import views
 
 urlpatterns = [
     path('',views.UserView.as_view(),name="create_user"),
-    path('instance/',views.UserInstanceView.as_view(),name="user_instance"),
+    path('instance/',views.AccountUserView.as_view(),name="user_instance"),
+    path('profile/',views.AccountProfileView.as_view(),name="profile"),
     path('api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path("google_signup/",views.GoogleSingUpView.as_view(),name="google_signup"),
     path("facebook_signup/",views.FacebookSingUpView.as_view(),name="facebook_signup"),

@@ -119,15 +119,6 @@ class User(AbstractBaseUser):
             'access': str(refresh.access_token)
         }
 
-MALE = "Male"
-FEMALE = "Female"
-RATHER_NOT_SAY = "Rather_Not_Say"
-
-gender_choices = (
-    (MALE,"Male"),
-    (FEMALE,"Female"),
-    (RATHER_NOT_SAY,"Rather_Not_Say")
-)
 class Profile(models.Model):
     """This is any changable info on the user
 
@@ -139,17 +130,7 @@ class Profile(models.Model):
     bio = models.TextField()
     location = models.CharField(max_length=50)
     avatar = models.ImageField(upload_to="profiles/")
-    gender = models.CharField(max_length=50,choices=gender_choices)
     receive_notifications_via_email = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.first_name + "'s profile"
-
-class StaffProfile(models.Model):
-    """This holds information on a staff members assigned storage facility
-
-    Args:
-        models ([type]): [description]
-    """
-    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="staff_profile")
-    storage_facility = models.ForeignKey("storage.StorageFacility",on_delete=models.SET_NULL,null=True)

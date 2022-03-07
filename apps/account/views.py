@@ -20,19 +20,25 @@ class UserView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [CheckRole]
 
-class UserInstanceView(APIView):
+class AccountUserView(generics.RetrieveAPIView):
     """This return a user instance
 
     Args:
         APIView ([type]): [description]
     """
+    serializer_class = AccountUserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    @swagger_auto_schema(responses={200: GetUserSerializer()})
-    def get(self,request):
-        data = GetUserSerializer(request.user).data
-        responseStatus = status.HTTP_200_OK
 
-        return Response(data,status=responseStatus)
+    def get_object(self):
+        return self.request.user
+
+class AccountProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = AccountProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.profile
+
 
 class GoogleSingUpView(APIView):
 
