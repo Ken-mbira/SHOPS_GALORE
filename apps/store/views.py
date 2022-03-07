@@ -42,21 +42,32 @@ class StoreProductListView(generics.ListCreateAPIView):
             return StoreGetProductSerializer
 
     def create(self, request, *args, **kwargs):
-        data = request.data
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            if Shop.objects.get(pk=data['owner']).owner != request.user:
-                return Response("You do not have permission to perform this action",status.HTTP_401_UNAUTHORIZED)
-            else:
+        if serializer.is_valid() and serializer.validate_the_owner(request.user):
                 self.perform_create(serializer)
                 return Response(serializer.data)
 
         else:
             return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
 
+class StoreProductDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-    # def perform_create(self, serializer):
-    #     product = self.get_object()
-    #     if serializer.is_valid():
-    #         if(product.owner.owner != self.request.user):
-    #             raise APIException("You do not have permission to perform this action",status.HTTP_401_UNAUTHORIZED)
+    def get_queryset(self):
+        return Product.objects.filter(owner__owner = self.request.user)
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST','PUT','PATCH']:
+            return StoreCreateProductSerializer
+
+        else:
+            return StoreGetProductSerializer
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid() and serializer.validate_the_owner(request.user):
+                self.perform_update(serializer)
+                return Response(serializer.data)
+
+        else:
+            return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)

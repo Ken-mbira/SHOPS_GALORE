@@ -55,6 +55,11 @@ class StoreCreateProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+    def validate_the_owner(self,user):
+        if self.validated_data['owner'].owner != user:
+            raise serializers.ValidationError("You are not allowed to perform this action")
+        return True
+
     def create(self, validated_data):
         attributes = validated_data.pop("attribute_value")
         product = Product.objects.create(**validated_data)
@@ -66,7 +71,7 @@ class StoreGetProductSerializer(serializers.ModelSerializer):
     category = StoreCategorySerializer()
     brand = StoreBrandSerializer()
     type = StoreTypeSerializer()
-    attribute_value = StoreAttributeValueSerializer()
+    attribute_value = StoreAttributeValueSerializer(many=True)
     class Meta:
         model = Product
         fields = '__all__'
