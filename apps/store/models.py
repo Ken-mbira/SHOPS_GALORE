@@ -142,11 +142,6 @@ class Product(models.Model):
             continue
         return None
 
-    # def save(self,**kwargs):
-    #     if self.sku == "":
-    #         self.sku  = uuid.uuid4()
-    #     super().save()
-
 class Review(models.Model):
     """This stores the customer opinions of the products
 

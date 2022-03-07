@@ -52,6 +52,7 @@ class StoreProductListView(generics.ListCreateAPIView):
 
 class StoreProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'sku'
 
     def get_queryset(self):
         return Product.objects.filter(owner__owner = self.request.user)
@@ -64,7 +65,7 @@ class StoreProductDetailView(generics.RetrieveUpdateDestroyAPIView):
             return StoreGetProductSerializer
 
     def update(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(self.get_object(),data=request.data)
         if serializer.is_valid() and serializer.validate_the_owner(request.user):
                 self.perform_update(serializer)
                 return Response(serializer.data)

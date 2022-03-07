@@ -1,3 +1,4 @@
+from turtle import update
 from unicodedata import category
 from rest_framework import serializers
 
@@ -66,6 +67,24 @@ class StoreCreateProductSerializer(serializers.ModelSerializer):
         for attribute in attributes:
             product.attribute_value.add(attribute)
         return product
+
+    def update(self, instance, validated_data):
+        attributes = validated_data.pop("attribute_value")
+        instance.name = validated_data['name']
+        instance.category = validated_data['category']
+        instance.type = validated_data['type']
+        instance.owner = validated_data['owner']
+        instance.description = validated_data['description']
+        instance.price = validated_data['price']
+        instance.discount_price = validated_data['discount_price']
+        instance.volume = validated_data['volume']
+        instance.weight = validated_data['weight']
+        instance.active = validated_data['active']
+        for attribute in attributes:
+            instance.attribute_value.add(attribute)
+
+        instance.save()
+        return instance
 
 class StoreGetProductSerializer(serializers.ModelSerializer):
     category = StoreCategorySerializer()
