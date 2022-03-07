@@ -10,6 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from apps.store.models import *
 from apps.store.serializers import *
 from apps.store.permissions import *
+from apps.store.filters import *
 
 class StoreShopListView(generics.ListCreateAPIView):
     serializer_class = StoreShopSerializer
@@ -33,6 +34,8 @@ class StoreShopDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class StoreProductListView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilters
 
     def get_queryset(self):
         return Product.objects.filter(owner__owner = self.request.user)
