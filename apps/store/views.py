@@ -51,6 +51,9 @@ class StoreProductListView(generics.ListCreateAPIView):
                 self.perform_create(serializer)
                 return Response(serializer.data)
 
+        else:
+            return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
+
 
     # def perform_create(self, serializer):
     #     product = self.get_object()
