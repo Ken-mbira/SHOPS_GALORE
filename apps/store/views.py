@@ -33,7 +33,7 @@ class StoreShopDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Shop.objects.filter(owner = self.request.user)
 
 class StoreProductListView(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated & IsStoreOwner]
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilters
 
@@ -57,7 +57,7 @@ class StoreProductListView(generics.ListCreateAPIView):
             return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
 
 class StoreProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated  & IsStoreOwner]
     lookup_field = 'sku'
 
     def get_queryset(self):
@@ -82,17 +82,17 @@ class StoreProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 class StoreTypeView(generics.ListAPIView):
     queryset = Type.objects.all()
     serializer_class = StoreTypeSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated  & IsStoreOwner]
 
 class StoreBrandView(generics.ListAPIView):
     queryset = Brand.objects.all()
     serializer_class = StoreBrandSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated  & IsStoreOwner]
 
 class StoreAttributeView(generics.ListAPIView):
     queryset = Attribute.objects.all()
     serializer_class = StoreAttributeSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated  & IsStoreOwner]
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttributeFilters
 
@@ -104,7 +104,7 @@ class CategoryView(APIView):
     Args:
         APIView ([type]): [description]
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated  & IsStoreOwner]
 
     def get(self,request,format=None):
         """This lists all the categories out
@@ -121,7 +121,7 @@ class StoreLocationView(APIView):
     Args:
         APIView ([type]): [description]
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated  & IsStoreOwner]
 
     def get(self,request,format=None):
         """This lists all the categories out
