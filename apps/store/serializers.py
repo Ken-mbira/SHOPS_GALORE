@@ -126,3 +126,24 @@ class GetCategorySerializer(serializers.ModelSerializer):
         if self.depth !=1:
             fields['children'] = GetCategorySerializer(many=True,required=False)
         return fields
+
+class ShopLocationSerializer(serializers.ModelSerializer):
+    """This handles the categories when its a get request
+    Args:
+        serializers ([type]): [description]
+    Returns:
+        [type]: [description]
+    """
+    def __init__(self, *args, depth=0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.depth = depth
+
+    class Meta:
+        model = Location
+        fields = ['id','name']
+
+    def get_fields(self):
+        fields = super(ShopLocationSerializer,self).get_fields()
+        if self.depth !=1:
+            fields['children'] = ShopLocationSerializer(many=True,required=False)
+        return fields
