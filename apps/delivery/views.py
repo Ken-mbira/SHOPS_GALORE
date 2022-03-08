@@ -51,3 +51,19 @@ class DeliveryRegisteredMeansDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return RegisteredMeans.objects.filter(owner = self.request.user)
 
+class DeliveryDestinationListView(generics.ListCreateAPIView):
+    serializer_class = DeliveryDestinationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Destination.objects.filter(means__owner = self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid() and serializer.validate_the_owner(request.user):
+            self.perform_create(serializer)
+            return Response(serializer.data)
+
+        else:
+            return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)

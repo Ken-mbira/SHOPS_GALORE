@@ -59,7 +59,7 @@ class Destination(models.Model):
     price = models.DecimalField(max_digits=10,decimal_places=2)
 
     def __str__(self):
-        self.means + " - " + self.location.name
+        return str(self.means.pk) + " - " + self.location_from.name + " " + self.location_to.name 
 
     class Meta:
         unique_together = ("means","location_from","location_to")
