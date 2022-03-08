@@ -95,3 +95,23 @@ class StoreAttributeView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttributeFilters
+
+class StoreCategoryView(generics.ListAPIView):
+    queryset = Category.objects.all()
+
+class CategoryView(APIView):
+    """This handles the categories
+    Args:
+        APIView ([type]): [description]
+    """
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get(self,request,format=None):
+        """This lists all the categories out
+        Args:
+            request ([type]): [description]
+            format ([type], optional): [description]. Defaults to None.
+        """
+        categories = Category.objects.filter(level=0)
+        data = GetCategorySerializer(categories,many=True).data
+        return Response(data,status.HTTP_200_OK)

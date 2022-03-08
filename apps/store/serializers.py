@@ -105,3 +105,24 @@ class StoreGetProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+class GetCategorySerializer(serializers.ModelSerializer):
+    """This handles the categories when its a get request
+    Args:
+        serializers ([type]): [description]
+    Returns:
+        [type]: [description]
+    """
+    def __init__(self, *args, depth=0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.depth = depth
+
+    class Meta:
+        model = Category
+        fields = ['id','name']
+
+    def get_fields(self):
+        fields = super(GetCategorySerializer,self).get_fields()
+        if self.depth !=1:
+            fields['children'] = GetCategorySerializer(many=True,required=False)
+        return fields
