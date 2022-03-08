@@ -21,7 +21,7 @@ class Shop(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,editable=False)
     owner = models.ForeignKey(User,on_delete=models.PROTECT,related_name="shops")
     logo = models.ImageField(upload_to="store_profiles/",null=True)
-    # pickup_location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="shop")
+    pickup_location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="shop")
     phone_contact = PhoneNumberField()
     email_contact = models.EmailField()
     active = models.BooleanField(default=True)
