@@ -40,13 +40,24 @@ class StoreTypeSerializer(serializers.ModelSerializer):
         model = Type
         fields = '__all__'
 
+class StoreAttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        exclude = ["attribute"]
+
 class StoreAttributeSerializer(serializers.ModelSerializer):
+    attribute_values = StoreAttributeValueSerializer(many=True)
     class Meta:
         model = Attribute
         fields = '__all__'
 
-class StoreAttributeValueSerializer(serializers.ModelSerializer):
-    attribute = StoreAttributeSerializer()
+class ProductAttributeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attribute
+        fields = '__all__'
+
+class ProductAttributeValueSerializer(serializers.ModelSerializer):
+    attribute = ProductAttributeSerializer()
     class Meta:
         model = AttributeValue
         fields = '__all__'
@@ -90,7 +101,7 @@ class StoreGetProductSerializer(serializers.ModelSerializer):
     category = StoreCategorySerializer()
     brand = StoreBrandSerializer()
     type = StoreTypeSerializer()
-    attribute_value = StoreAttributeValueSerializer(many=True)
+    attribute_value = ProductAttributeValueSerializer(many=True)
     class Meta:
         model = Product
         fields = '__all__'

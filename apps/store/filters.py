@@ -19,3 +19,11 @@ class ProductFilters(django_filters.FilterSet):
             "parent__id":['exact'],
             "active":['exact']
         }
+
+class AttributeFilters(django_filters.FilterSet):
+    class Meta:
+        model = Attribute
+        fields = {
+            "type__id":['exact'],
+            "name":['exact']
+        }

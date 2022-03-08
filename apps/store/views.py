@@ -78,3 +78,20 @@ class StoreProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         else:
             return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
+
+class StoreTypeView(generics.ListAPIView):
+    queryset = Type.objects.all()
+    serializer_class = StoreTypeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class StoreBrandView(generics.ListAPIView):
+    queryset = Brand.objects.all()
+    serializer_class = StoreBrandSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class StoreAttributeView(generics.ListAPIView):
+    queryset = Attribute.objects.all()
+    serializer_class = StoreAttributeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = AttributeFilters
