@@ -67,3 +67,19 @@ class DeliveryDestinationListView(generics.ListCreateAPIView):
 
         else:
             return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
+
+class DeliveryDestinationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = DeliveryDestinationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Destination.objects.filter(means__owner = self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object(),data=request.data)
+        if serializer.is_valid() and serializer.validate_the_owner(request.user):
+            self.perform_update(serializer)
+            return Response(serializer.data)
+
+        else:
+            return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
