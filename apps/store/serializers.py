@@ -71,6 +71,11 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
         model = Attribute
         fields = '__all__'
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = '__all__'
+
 class ProductAttributeValueSerializer(serializers.ModelSerializer):
     attribute = ProductAttributeSerializer()
     class Meta:
@@ -117,6 +122,8 @@ class StoreSubProductSerializer(serializers.ModelSerializer):
     brand = StoreBrandSerializer()
     type = StoreTypeSerializer()
     attribute_value = ProductAttributeValueSerializer(many=True)
+    featured_image = ProductImageSerializer()
+    product_images = ProductImageSerializer(many=True)
     class Meta:
         model = Product
         fields = '__all__'
@@ -125,8 +132,10 @@ class StoreGetProductSerializer(serializers.ModelSerializer):
     category = StoreCategorySerializer()
     brand = StoreBrandSerializer()
     type = StoreTypeSerializer()
+    featured_image = ProductImageSerializer()
     children = StoreSubProductSerializer(many=True)
     attribute_value = ProductAttributeValueSerializer(many=True)
+    product_images = ProductImageSerializer(many=True)
     class Meta:
         model = Product
         fields = '__all__'

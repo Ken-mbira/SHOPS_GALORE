@@ -146,6 +146,10 @@ class Product(models.Model):
     def children(self):
         return Product.objects.filter(parent=self)
 
+    @property
+    def product_images(self):
+        return Media.objects.filter(product = self)
+
 class Review(models.Model):
     """This stores the customer opinions of the products
 
