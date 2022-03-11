@@ -17,7 +17,7 @@ class DeliveryLocationView(APIView):
     Args:
         APIView ([type]): [description]
     """
-    permission_classes = [permissions.IsAuthenticated & IsDeliveryPerson]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self,request,format=None):
         """This lists all the categories out

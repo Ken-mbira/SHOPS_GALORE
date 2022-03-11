@@ -32,6 +32,14 @@ class StoreShopDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Shop.objects.filter(owner = self.request.user)
 
+class StoreLogoView(generics.RetrieveUpdateAPIView):
+    queryset = Shop.objects.all()
+    serializer_class = StoreLogoSerializer
+    permission_classes = [permissions.IsAuthenticated & IsStoreOwner]
+
+    def get_queryset(self):
+        return Shop.objects.filter(owner = self.request.user)
+
 class StoreProductListView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated & IsStoreOwner]
     filter_backends = [DjangoFilterBackend]
@@ -116,19 +124,8 @@ class CategoryView(APIView):
         data = GetCategorySerializer(categories,many=True).data
         return Response(data,status.HTTP_200_OK)
 
-class StoreLocationView(APIView):
-    """This handles the categories
-    Args:
-        APIView ([type]): [description]
-    """
-    permission_classes = [permissions.IsAuthenticated  & IsStoreOwner]
-
-    def get(self,request,format=None):
-        """This lists all the categories out
-        Args:
-            request ([type]): [description]
-            format ([type], optional): [description]. Defaults to None.
-        """
-        locations = Location.objects.filter(level=0)
-        data = ShopLocationSerializer(locations,many=True).data
-        return Response(data,status.HTTP_200_OK)
+class StoreLocationView(generics.ListAPIView):
+    serializer_class = ShopLocationSerializer
+    queryset = Location.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id']

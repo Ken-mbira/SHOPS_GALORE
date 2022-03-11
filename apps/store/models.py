@@ -119,7 +119,7 @@ class Product(models.Model):
     type = models.ForeignKey(Type,on_delete=models.SET_NULL,related_name="products",null=True,blank=True)
     added_on = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Shop,on_delete=models.PROTECT,related_name="products")
-    attribute_value = models.ManyToManyField(AttributeValue,related_name="products")
+    attribute_value = models.ManyToManyField(AttributeValue,related_name="products",blank=True)
     description = models.TextField(null=True,blank=True)
     price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
     discount_price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)

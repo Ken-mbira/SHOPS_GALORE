@@ -4,12 +4,28 @@ from rest_framework import serializers
 
 from apps.store.models import *
 
+class StoreLogoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shop
+        fields = ['logo']
+
+    def update(self, instance, validated_data):
+        instance.logo = validated_data['logo']
+        instance.save()
+        return instance
+
+class LocationStoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = ['id','name']
+        read_only_fields = ['name']
+
 class StoreShopSerializer(serializers.ModelSerializer):
     product_count = serializers.IntegerField(read_only=True)
     class Meta:
         model = Shop
         fields = '__all__'
-        read_only_fields = ['owner']
+        read_only_fields = ['owner','logo']
 
     def create(self, validated_data):
         return Shop.objects.create(**validated_data)
@@ -17,7 +33,6 @@ class StoreShopSerializer(serializers.ModelSerializer):
     def update(self,instance,validated_data):
         instance.name = validated_data['name']
         instance.bio = validated_data['bio']
-        instance.logo = validated_data['logo']
         instance.pickup_location = validated_data['pickup_location']
         instance.phone_contact = validated_data['phone_contact']
         instance.email_contact = validated_data['email_contact']
@@ -134,16 +149,7 @@ class ShopLocationSerializer(serializers.ModelSerializer):
     Returns:
         [type]: [description]
     """
-    def __init__(self, *args, depth=0, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.depth = depth
 
     class Meta:
         model = Location
         fields = ['id','name']
-
-    def get_fields(self):
-        fields = super(ShopLocationSerializer,self).get_fields()
-        if self.depth !=1:
-            fields['children'] = ShopLocationSerializer(many=True,required=False)
-        return fields
