@@ -112,10 +112,20 @@ class StoreCreateProductSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class StoreSubProductSerializer(serializers.ModelSerializer):
+    category = StoreCategorySerializer()
+    brand = StoreBrandSerializer()
+    type = StoreTypeSerializer()
+    attribute_value = ProductAttributeValueSerializer(many=True)
+    class Meta:
+        model = Product
+        fields = '__all__'
+
 class StoreGetProductSerializer(serializers.ModelSerializer):
     category = StoreCategorySerializer()
     brand = StoreBrandSerializer()
     type = StoreTypeSerializer()
+    children = StoreSubProductSerializer(many=True)
     attribute_value = ProductAttributeValueSerializer(many=True)
     class Meta:
         model = Product

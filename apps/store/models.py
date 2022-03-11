@@ -142,6 +142,10 @@ class Product(models.Model):
             continue
         return None
 
+    @property
+    def children(self):
+        return Product.objects.filter(parent=self)
+
 class Review(models.Model):
     """This stores the customer opinions of the products
 
