@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from datetime import datetime
 import uuid
@@ -21,29 +22,20 @@ class Shop(models.Model):
     owner = models.ForeignKey(User,on_delete=models.PROTECT,related_name="shops")
     logo = models.ImageField(upload_to="store_profiles/",null=True)
     pickup_location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="shop")
-    phone_contact = PhoneNumberField(region="KE")
+    phone_contact = PhoneNumberField()
     email_contact = models.EmailField()
-    subscription_end_date = models.DateField(null=True)
-    functional = models.BooleanField(default=True)
+    active = models.BooleanField(default=True)
 
 
     def __str__(self):
         return self.name
 
     @property
-    def active(self):
-        if (self.subscription_end_date is None) or datetime(self.subscription_end_date) < datetime.now() or (self.owner.is_active == False) or self.functional == False:
-            return False
-        return True
-
-    @property
-    def products(self):
-        """This gets all the products within a shop
-        """
-        return Product.objects.filter(owner = self).count()
+    def product_count(self):
+        return Product.objects.filter(owner = self,active=True).count()
 
     def deactivate(self):
-        self.functional = False
+        self.active = False
         self.save()
 
 
@@ -55,7 +47,7 @@ class Brand(models.Model):
         models ([type]): [description]
     """
     name = models.CharField(max_length = 50)
-    logo = models.ImageField(upload_to="brand_logos/",null=True)
+    logo = models.ImageField(upload_to="brand_logos/",null=True,blank=True)
 
 class Category(MPTTModel):
     """Inventory category table
@@ -63,32 +55,15 @@ class Category(MPTTModel):
     Args:
         MPTTModel ([type]): [description]
     """
-    name = models.CharField(
-        max_length=100,
-        verbose_name="category name",
-        help_text="format: required, max_length=100"
-    ) 
-
-    is_active = models.BooleanField(
-        default=True,
-    )
-
-    parent = TreeForeignKey("self",
-    on_delete=models.PROTECT,
-    related_name="children",
-    null=True,
-    unique=False,
-    blank=True,
-    verbose_name="parent of category",
-    help_text="Format: not required"
-    )
+    name = models.CharField(max_length=100) 
+    parent = TreeForeignKey("self",on_delete=models.PROTECT,related_name="children",null=True,blank=True)
 
     class MPTTMeta:
         order_insertion_by = ['name']
 
     class Meta:
         verbose_name="Product Category"
-        verbose_name_plural="Product categories"
+        verbose_name_plural="Product Categories"
 
     def __str__(self):
         return self.name
@@ -100,7 +75,7 @@ class Type(models.Model):
         models ([type]): [description]
     """
     name = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(null=True,blank=True)
 
     def __str__(self):
         return self.name
@@ -112,7 +87,7 @@ class Attribute(models.Model):
         models ([type]): [description]
     """
     name = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(null=True,blank=True)
     type = models.ManyToManyField(Type,related_name="attributes")
 
     def __str__(self):
@@ -126,7 +101,7 @@ class AttributeValue(models.Model):
     """
     value = models.CharField(max_length=50)
     attribute = models.ForeignKey(Attribute,on_delete=models.PROTECT,related_name="attribute_values")
-    description = models.TextField(null=True)
+    description = models.TextField(null=True,blank=True)
 
     def __str__(self):
         return self.attribute.name + " - " + self.value
@@ -137,40 +112,27 @@ class Product(models.Model):
     Args:
         models ([type]): [description]
     """
+    sku = models.CharField(max_length=200,null=True,unique=True,blank=True)
     name = models.CharField(max_length=100)
-    brand = models.ForeignKey(Brand,on_delete=models.PROTECT,related_name="product")
-    category = models.ForeignKey(Category,on_delete=models.PROTECT,related_name="product")
-    type = models.ForeignKey(Type,on_delete=models.SET_NULL,related_name="product",null=True)
+    brand = models.ForeignKey(Brand,on_delete=models.SET_NULL,related_name="products",null=True,blank=True)
+    category = models.ForeignKey(Category,on_delete=models.PROTECT,related_name="products")
+    type = models.ForeignKey(Type,on_delete=models.SET_NULL,related_name="products",null=True,blank=True)
     added_on = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey(Shop,on_delete=models.PROTECT,related_name="product")
-    attribute_value = models.ManyToManyField(AttributeValue,related_name="product")
+    owner = models.ForeignKey(Shop,on_delete=models.PROTECT,related_name="products")
+    attribute_value = models.ManyToManyField(AttributeValue,related_name="products",blank=True)
     description = models.TextField(null=True,blank=True)
     price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
     discount_price = models.DecimalField(max_digits=9,decimal_places=2,null=True,blank=True)
-    volume = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True)
+    volume = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True,verbose_name="Volume in m3")
     weight = models.DecimalField(max_digits=5,decimal_places=2,verbose_name="Weight in kilograms",null=True,blank=True)
-    sku = models.CharField(max_length=200,null=True,unique=True,blank=True)
-    parent = TreeForeignKey(
-        "self",
-        on_delete=models.PROTECT,related_name="children",
-        null=True,
-        unique=False,
-        blank=True,
-        verbose_name="parent of product",
-        help_text="Format: not required"
-    )
+    parent = TreeForeignKey("self",on_delete=models.PROTECT,related_name="children",null=True,unique=False,blank=True,verbose_name="parent of product",)
+    active = models.BooleanField(default=False)
 
     class MPTTMeta:
         order_insertion_by = ['added_on']
 
     def __str__(self):
         return self.name
-
-    @property
-    def active(self):
-        if self.owner.active and Media.objects.filter(product = self).count() > 4:
-            return True
-        return False
 
     @property
     def featured_image(self):
@@ -180,10 +142,13 @@ class Product(models.Model):
             continue
         return None
 
-    def save(self,**kwargs):
-        if self.sku == "":
-            self.sku  = uuid.uuid4()
-        super().save()
+    @property
+    def children(self):
+        return Product.objects.filter(parent=self)
+
+    @property
+    def product_images(self):
+        return Media.objects.filter(product = self)
 
 class Review(models.Model):
     """This stores the customer opinions of the products
@@ -197,7 +162,7 @@ class Review(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name="reviews")
     user = models.ForeignKey(settings.AUTH_USER_MODEL,related_name="reviews",null=True,on_delete=models.SET_NULL)
     created_on = models.DateTimeField(auto_now_add=True)
-    comment = models.TextField(null=True)
+    comment = models.TextField(null=True,blank=True)
     rating = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)])
 
     def __str__(self):
@@ -210,7 +175,7 @@ class Stock(models.Model):
         models ([type]): [description]
     """
     product = models.OneToOneField(Product,on_delete=models.CASCADE,related_name="stock")
-    count = models.IntegerField()
+    count = models.IntegerField(default=0)
     last_stock_check_date = models.DateField()
 
     def __str__(self):

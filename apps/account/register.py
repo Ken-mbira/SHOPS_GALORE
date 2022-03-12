@@ -32,6 +32,6 @@ class HandleSocialUser:
             raise Exception("No account was found with the given credentials!")
 
         if user.auth_provider != provider:
-            raise Exception(f"""You have used a different provider for your account. Please proceed to login using {provider}""")
+            raise Exception(f"""You have used a different provider for your account. Please proceed to login using {user.auth_provider}""")
 
         return user

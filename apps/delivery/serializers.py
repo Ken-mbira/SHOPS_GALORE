@@ -6,34 +6,10 @@ from apps.account.models import *
 from apps.store.models import *
 from apps.delivery.models import *
 
-class RecursiveField(serializers.BaseSerializer):
-    def to_representation(self, value):
-        depth = self.context.get('depth', 0)
-        self.context['depth'] = depth+1
-        ParentSerializer = self.parent.parent.__class__
-        serializer = ParentSerializer(value, context=self.context, depth=self.context['depth'])
-
-        return serializer.data
-
-    def to_internal_value(self, data):
-        ParentSerializer = self.parent.parent.__class__
-        Model = ParentSerializer.Meta.model
-        try:
-            instance = Model.objects.get(pk=data)
-        except ObjectDoesNotExist:
-            raise serializers.ValidationError(
-                "Objeto {0} does not exists".format(
-                    Model().__class__.__name__
-                )
-            )
-        return instance
-
-class LocationSerializer(serializers.ModelSerializer):
-    """This handles the location model
-
+class DeliveryLocationSerializer(serializers.ModelSerializer):
+    """This handles the categories when its a get request
     Args:
         serializers ([type]): [description]
-
     Returns:
         [type]: [description]
     """
@@ -46,91 +22,60 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ['id','name']
 
     def get_fields(self):
-        fields = super(LocationSerializer,self).get_fields()
+        fields = super(DeliveryLocationSerializer,self).get_fields()
         if self.depth !=1:
-            fields['children'] = LocationSerializer(many=True,required=False)
+            fields['children'] = DeliveryLocationSerializer(many=True,required=False)
         return fields
 
-class RegisterMeansSerializer(serializers.ModelSerializer):
-    """This handles the means
-
-    Args:
-        serializers ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
+class DeliveryMeansSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DeliveryMeans
+        model = Means
+        fields = '__all__'
+
+class DeliveryRegisteredMeansSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegisteredMeans
         fields = '__all__'
         read_only_fields = ['owner']
 
-    def save(self,request):
-        mean = DeliveryMeans(
-            owner = request.user,
-            means = self.validated_data['means'],
-            image = self.validated_data['image'],
-            max_weight = self.validated_data['max_weight']
-        )
+    def create(self, validated_data):
         try:
-            mean.save()
+            means = RegisteredMeans.objects.create(**validated_data)
         except:
-            raise serializers.ValidationError("You have already registered such means")
-        return mean
+            raise serializers.ValidationError("You have already registered this means of travel!")
 
-class DeliveryMeansImage(serializers.Serializer):
-    """This adds a way to update the image for a means
+        return means
 
-    Args:
-        serializers ([type]): [description]
-    """
-    image = serializers.ImageField(required=True)
 
-    def save(self,means):
-        means.image = self.validated_data['image']
-        means.save()
+    def update(self, instance, validated_data):
+        instance.means = validated_data['means']
+        instance.image = validated_data['image']
+        instance.max_weight = validated_data['max_weight']
+        instance.max_volume = validated_data['max_volume']
+        instance.active = validated_data['active']
+        try:
+            instance.save()
+        except Exception as e:
+            raise serializers.ValidationError("You have already registered this means of travel!")
+        return instance
 
-class DestinationSerializer(serializers.ModelSerializer):
-    """This handles the creation of a destination
-
-    Args:
-        serializers ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
+class DeliveryDestinationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Destination
-        fields = ['location_from','location_to','price','means','id']
-        read_only_fields = ['means','id']
+        fields = '__all__'
 
-    def save(self,means):
-        """Handles saving a destination
+    def validate_the_owner(self,user):
+        if self.validated_data['means'].owner != user:
+            raise serializers.ValidationError("You are not allowed to perform this action")
+        return True
 
-        Args:
-            means ([type]): [description]
+    def create(self, validated_data):
+        return Destination.objects.create(**validated_data)
 
-        Returns:
-            [type]: [description]
-        """
-        try:
-            destination = Destination(means = means,location_from= self.validated_data['location_from'],location_to = self.validated_data['location_to'],price=self.validated_data['price'])
-            destination.save()
-            return destination
-
-        except Exception as e:
-            print(e)
-            raise serializers.ValidationError("You have already set such a destination!")
-
-class DestinationPriceSerializer(serializers.Serializer):
-    """This handles updating a destination's price
-
-    Args:
-        serializers ([type]): [description]
-    """
-    price = serializers.DecimalField(max_digits=10,decimal_places=2)
-
-    def save(self,destination):
-        destination.price = self.validated_data['price']
-        destination.save()
-        return destination
+    def update(self, instance, validated_data):
+        instance.means = validated_data['means']
+        instance.location_from = validated_data['location_from']
+        instance.location_to = validated_data['location_to']
+        instance.price = validated_data['price']
+        instance.save()
+        return instance
