@@ -28,6 +28,7 @@ class Cart(models.Model):
             self.token  = uuid.uuid4()
         super().save()
 
+
 class CartItem(models.Model):
     """This is one instance of a product within a cart
 
