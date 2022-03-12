@@ -1,385 +1,149 @@
-from django.core.exceptions import ValidationError
-from django.db.models import fields
-from django.db.models.fields import IntegerField
+from turtle import update
+from unicodedata import category
 from rest_framework import serializers
 
 from apps.store.models import *
-from apps.delivery.serializers import RecursiveField
 
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '__all__'
-
-class ShopSerializer(serializers.ModelSerializer):
-    """this handles the shop instances
-
-    Args:
-        serializers ([type]): [description]
-    """
+class StoreLogoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
-        fields = ['id','name','bio','created_on','logo','phone_contact','email_contact','subscription_end_date','functional','owner','pickup_location','products']
-        read_only_fields = ['logo','subscription_end_date','owner','functional']
+        fields = ['logo']
 
-    def save(self,request):
-        shop = Shop(name = self.validated_data['name'],bio = self.validated_data['bio'],owner = request.user,pickup_location = self.validated_data['pickup_location'],phone_contact = self.validated_data['phone_contact'],email_contact = self.validated_data['email_contact'])
-        shop.save()
-        return shop
-
-    def update(self,instance):
-        instance.name = self.validated_data['name']
-        instance.bio = self.validated_data['bio']
-        instance.pickup_location = self.validated_data['pickup_location']
-        instance.phone_contact = self.validated_data['phone_contact']
-        instance.email_contact = self.validated_data['email_contact']
-        instance.save()
-        return instance
-        
-class UpdateShopSerializer(serializers.Serializer):
-    """This handles shop updating
-
-    Args:
-        serializers ([type]): [description]
-    """
-    shop = serializers.CharField(required=True)
-
-    def delete(self):
-        try:
-            instance = Shop.objects.get(pk = int(self.validated_data['shop']))
-        except:
-            raise serializers.ValidationError("The object was not found")
-
-        instance.deactivate()
-
-    def validate_exists(self):
-        try:
-            Shop.objects.get(pk = int(self.validated_data['shop']))
-            return True
-        except:
-            raise serializers.ValidationError("The object was not found")
-
-class CreateProductWithoutVariation(serializers.ModelSerializer):
-    """This handles creation of a product without any variants
-
-    Args:
-        serializers ([type]): [description]
-
-    Raises:
-        ValidationError: [description]
-        ValidationError: [description]
-
-    Returns:
-        [type]: [description]
-    """
-    class Meta:
-        model = Product
-        fields = ['name','brand','category','type','description','price','volume','sku','weight']
-
-    def save(self,shop):
-        product = Product(
-            name = self.validated_data['name'],
-            owner = shop,
-            brand = self.validated_data['brand'],
-            category = self.validated_data['category'],
-            type = self.validated_data['type'],
-            description = self.validated_data['description'],
-            price = self.validated_data['price'],
-            volume = self.validated_data['volume'],
-            sku = self.validated_data['sku'],
-            weight = self.validated_data['weight']
-        )
-        product.save()
-
-        return product
-
-class CreateParentProductSerializer(serializers.ModelSerializer):
-    """This handles a parent product with variants
-
-    Args:
-        serializers ([type]): [description]
-
-    Raises:
-        ValidationError: [description]
-        ValidationError: [description]
-
-    Returns:
-        [type]: [description]
-    """
-    class Meta:
-        model = Product
-        fields = ['name','brand','category','type','description']
-
-    def save(self,shop):
-        product = Product(
-            name = self.validated_data['name'],
-            owner = shop,
-            brand = self.validated_data['brand'],
-            category = self.validated_data['category'],
-            type = self.validated_data['type'],
-            description = self.validated_data['description'],
-        )
-        product.save()
-
-        return product
-
-class CreateChildProductSerializer(serializers.ModelSerializer):
-    """This handles a child product
-
-    Args:
-        serializers ([type]): [description]
-
-    Raises:
-        ValidationError: [description]
-        ValidationError: [description]
-
-    Returns:
-        [type]: [description]
-    """
-    attributes = serializers.ListField()
-    parent = serializers.IntegerField(required=True)
-    class Meta:
-        model = Product
-        fields = ['price','volume','sku','parent','attributes','weight']
-
-    def save(self,shop):
-        try:
-            parent = Product.objects.get(pk = self.validated_data['parent'])
-
-        except:
-            raise ValidationError("No product was found with that parent id")
-
-        product = Product(
-            name = parent.name,
-            owner = shop,
-            brand = parent.brand,
-            category = parent.category,
-            type = parent.type,
-            description = parent.description,
-            price = self.validated_data['price'],
-            volume = self.validated_data['volume'],
-            sku = self.validated_data['sku'],
-            parent = parent,
-            weight = self.validated_data['weight']
-        )
-        product.save()
-        for value in self.validated_data['attributes']:
-            attribute_value = AttributeValue.objects.get(pk = int(value))
-            product.attribute_value.add(attribute_value)
-            product.save()
-
-        return product
-
-
-    
-class CreateProductSerializers(serializers.ModelSerializer):
-    """This handles the creation of a new product
-
-    Args:
-        serializers ([type]): [description]
-    """
-    attributes = serializers.ListField()
-    class Meta:
-        model = Product
-        fields = ['name','brand','category','type','description','price','attributes']
-
-    def save(self,shop):
-        product = Product(
-            name = self.validated_data['name'],
-            owner = shop,
-            brand = self.validated_data['brand'],
-            category = self.validated_data['category'],
-            type = self.validated_data['type'],
-            description = self.validated_data['description'],
-            price = self.validated_data['price']
-        )
-        product.save()
-        for value in self.validated_data['attributes']:
-            attribute_value = AttributeValue.objects.get(pk = int(value))
-            product.attribute_value.add(attribute_value)
-            product.save()
-
-        return product
-
-    def update(self,instance):
-        instance.name = self.validated_data['name']
-        instance.brand = self.validated_data['brand']
-        instance.category = self.validated_data['category']
-        instance.type = self.validated_data['type']
-        instance.description = self.validated_data['description']
-        instance.price = self.validated_data['price']
-
+    def update(self, instance, validated_data):
+        instance.logo = validated_data['logo']
         instance.save()
         return instance
 
-class StockSerializer(serializers.ModelSerializer):
-    """This handles the stocks for a single product
-
-    Args:
-        serializers ([type]): [description]
-    """
+class LocationStoreSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Stock
-        fields = '__all__'
-        read_only_fields = ['product']
+        model = Location
+        fields = ['id','name']
+        read_only_fields = ['name']
 
-    def update(self,instance):
-        instance.count = self.validated_data['count']
-        instance.last_stock_check_date = self.validated_data['last_stock_check_date']
-        instance.save()
-        return instance.product
-
-class GetShopSerializer(serializers.ModelSerializer):
-    """This handles the response for getting all details about a shop
-
-    Args:
-        serializers ([type]): [description]
-    """
-    product = ProductSerializer(many=True)
-    active = serializers.ReadOnlyField()
+class StoreShopSerializer(serializers.ModelSerializer):
+    product_count = serializers.IntegerField(read_only=True)
     class Meta:
         model = Shop
-        fields = ['name','bio','created_on','owner','logo','pickup_location','phone_contact','email_contact','subscription_end_date','functional','active','product']
-
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
         fields = '__all__'
+        read_only_fields = ['owner','logo']
 
-class TypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Type
-        fields = '__all__'
+    def create(self, validated_data):
+        return Shop.objects.create(**validated_data)
 
-class CategorySerializer(serializers.ModelSerializer):
+    def update(self,instance,validated_data):
+        instance.name = validated_data['name']
+        instance.bio = validated_data['bio']
+        instance.pickup_location = validated_data['pickup_location']
+        instance.phone_contact = validated_data['phone_contact']
+        instance.email_contact = validated_data['email_contact']
+        instance.active = validated_data['active']
+        instance.save()
+        return instance
+
+class StoreCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
 
-class AttributeValueSerializer(serializers.ModelSerializer):
+class StoreBrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = '__all__'
+
+class StoreTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Type
+        fields = '__all__'
+
+class StoreAttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        exclude = ["attribute"]
+
+class StoreAttributeSerializer(serializers.ModelSerializer):
+    attribute_values = StoreAttributeValueSerializer(many=True)
+    class Meta:
+        model = Attribute
+        fields = '__all__'
+
+class ProductAttributeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attribute
+        fields = '__all__'
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = '__all__'
+
+class ProductAttributeValueSerializer(serializers.ModelSerializer):
+    attribute = ProductAttributeSerializer()
     class Meta:
         model = AttributeValue
         fields = '__all__'
 
-class AttributeSerializer(serializers.ModelSerializer):
-    attribute_values = AttributeValueSerializer(many=True)
-    class Meta:
-        model = Attribute
-        fields = ['name','description','type','attribute_values']
-
-class ProductImagesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Media
-        fields = '__all__'
-        read_only_fields = ['product','is_default']
-
-    def save(self,product):
-        try:
-            image = Media(product = product,image = self.validated_data['image'])
-            image.save()
-            return image
-        except Exception as e:
-            raise ValidationError("There was a problem updating your product image")
-
-    def make_featured(self,product,image):
-        currently_featured = Media.objects.filter(product = product,is_default = True)
-        if currently_featured is not None:
-            for current in currently_featured:
-                current.is_default = False
-                current.save()
-        image.is_featured = True
-        image.save()
-        return product
-
-class GetProductSerializer(serializers.ModelSerializer):
-    """This handles the response for a single product being viewed
-
-    Args:
-        serializers ([type]): [description]
-    """
-    def __init__(self, *args, depth=0, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.depth = depth
-
-    product_images = ProductImagesSerializer(many=True)
-    owner = ShopSerializer()
-    stock = StockSerializer()
-    brand = BrandSerializer()
-    category = CategorySerializer()
-    attribute_value = AttributeValueSerializer(many=True)
-    type = TypeSerializer()
-    featured_image = ProductImagesSerializer()
+class StoreCreateProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = [
-            'id',
-            'name',
-            'brand',
-            'category',
-            'type',
-            'added_on',
-            'owner',
-            'attribute_value',
-            'description',
-            'price',
-            'discount_price',
-            'stock',
-            'product_images',
-            'parent',
-            'sku',
-            'volume',
-            'weight',
-            'featured_image',
-        ]
-
-    def get_fields(self):
-        fields = super(GetProductSerializer,self).get_fields()
-        if self.depth !=1:
-            fields['children'] = GetProductSerializer(many=True,required=False)
-
-        return fields
-
-class DefaultImageSerializer(serializers.Serializer):
-    image = serializers.CharField(required=True)
-
-    def make_featured(self,product):
-        try:
-            image = Media.objects.get(pk = int(self.validated_data['image']))
-        except:
-            raise ValidationError("The image was not found")
-
-        currently_featured = Media.objects.filter(product = product,is_default = True)
-        if currently_featured is not None:
-            for current in currently_featured.iterator():
-                current.is_default = False
-                current.save()
-                
-        image.is_default = True
-        image.save()
-        return image 
-
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
         fields = '__all__'
 
-        read_only_fields = ['user','product']
+    def validate_the_owner(self,user):
+        if self.validated_data['owner'].owner != user:
+            raise serializers.ValidationError("You are not allowed to perform this action")
+        return True
 
-    def save(self,request,product):
-        if request.user.is_authenticated:
-            review = Review(product = product,user = request.user,comment = self.validated_data['comment'],rating=self.validated_data['rating'])
-        else:
-            review = Review(product = product,comment = self.validated_data['comment'],rating=self.validated_data['rating'])
+    def create(self, validated_data):
+        attributes = validated_data.pop("attribute_value")
+        product = Product.objects.create(**validated_data)
+        for attribute in attributes:
+            product.attribute_value.add(attribute)
+        return product
 
-        review.save()
-        return review
+    def update(self, instance, validated_data):
+        attributes = validated_data.pop("attribute_value")
+        instance.name = validated_data['name']
+        instance.category = validated_data['category']
+        instance.type = validated_data['type']
+        instance.owner = validated_data['owner']
+        instance.description = validated_data['description']
+        instance.price = validated_data['price']
+        instance.discount_price = validated_data['discount_price']
+        instance.volume = validated_data['volume']
+        instance.weight = validated_data['weight']
+        instance.active = validated_data['active']
+        for attribute in attributes:
+            instance.attribute_value.add(attribute)
+
+        instance.save()
+        return instance
+
+class StoreSubProductSerializer(serializers.ModelSerializer):
+    category = StoreCategorySerializer()
+    brand = StoreBrandSerializer()
+    type = StoreTypeSerializer()
+    attribute_value = ProductAttributeValueSerializer(many=True)
+    featured_image = ProductImageSerializer()
+    product_images = ProductImageSerializer(many=True)
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+class StoreGetProductSerializer(serializers.ModelSerializer):
+    category = StoreCategorySerializer()
+    brand = StoreBrandSerializer()
+    type = StoreTypeSerializer()
+    featured_image = ProductImageSerializer()
+    children = StoreSubProductSerializer(many=True)
+    attribute_value = ProductAttributeValueSerializer(many=True)
+    product_images = ProductImageSerializer(many=True)
+    class Meta:
+        model = Product
+        fields = '__all__'
 
 class GetCategorySerializer(serializers.ModelSerializer):
     """This handles the categories when its a get request
-
     Args:
         serializers ([type]): [description]
-
     Returns:
         [type]: [description]
     """
@@ -388,7 +152,7 @@ class GetCategorySerializer(serializers.ModelSerializer):
         self.depth = depth
 
     class Meta:
-        model = Location
+        model = Category
         fields = ['id','name']
 
     def get_fields(self):
@@ -396,3 +160,15 @@ class GetCategorySerializer(serializers.ModelSerializer):
         if self.depth !=1:
             fields['children'] = GetCategorySerializer(many=True,required=False)
         return fields
+
+class ShopLocationSerializer(serializers.ModelSerializer):
+    """This handles the categories when its a get request
+    Args:
+        serializers ([type]): [description]
+    Returns:
+        [type]: [description]
+    """
+
+    class Meta:
+        model = Location
+        fields = ['id','name']

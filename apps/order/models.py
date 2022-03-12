@@ -56,7 +56,7 @@ class ShopDailyOrders(models.Model):
         [type]: [description]
     """
     shop = models.ForeignKey(Shop,on_delete=models.SET_NULL,null=True,related_name="daily_orders")
-    pickup_means = models.ForeignKey(DeliveryMeans,on_delete=models.SET_NULL,null=True,related_name="daily_orders")
+    pickup_means = models.ForeignKey("delivery.RegisteredMeans",on_delete=models.SET_NULL,null=True,related_name="daily_orders")
     date = models.DateField(auto_now_add=True,editable=False)
     storage_location = models.ForeignKey(StorageFacility,on_delete=models.SET_NULL,null=True,related_name="shop_orders")
 
@@ -71,7 +71,7 @@ class Order(models.Model):
     """
     owner = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
     made_on = models.DateTimeField(auto_now_add=True,editable=False)
-    delivery_means = models.ForeignKey(DeliveryMeans,on_delete=models.SET_NULL,null=True)
+    delivery_means = models.ForeignKey("delivery.RegisteredMeans",on_delete=models.SET_NULL,null=True)
     staff_checked = models.BooleanField(default=False)
     delivered = models.BooleanField(default=False)
     id_password = models.CharField(max_length=256)

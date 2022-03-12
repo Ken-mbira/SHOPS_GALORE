@@ -23,6 +23,18 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
+STAFF = "STAFF"
+STORE_OWNER = "STORE_OWNER"
+DELIVERY = "DELIVERY"
+CUSTOMER = "CUSTOMER"
+
+roles = (
+    (STAFF,"staff"),
+    (STORE_OWNER,"store_owner"),
+    (DELIVERY,"delivery"),
+    (CUSTOMER,"customer")
+)
+
 class MyAccountManager(BaseUserManager):
     """defines the methods to manage the custom user to be created
 
@@ -41,7 +53,7 @@ class MyAccountManager(BaseUserManager):
             email=self.normalize_email(email),
             password = password
         )
-        user.role = Role.objects.get(name = "customer")
+        user.role = CUSTOMER
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -54,7 +66,7 @@ class MyAccountManager(BaseUserManager):
         user.is_admin = True
         user.is_superuser = True
         user.is_staff = True
-        user.role = Role.objects.get(name="staff")
+        user.role = STAFF
 
         user.save(using=self._db)
         return user
@@ -76,7 +88,7 @@ class User(AbstractBaseUser):
         [type]: [description]
     """
     email = models.EmailField(verbose_name='email',unique=True)
-    role = models.ForeignKey(Role,on_delete=models.PROTECT)
+    role = models.CharField(max_length=50,choices=roles)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     member_since = models.DateTimeField(auto_now_add=True,editable=False)
@@ -98,31 +110,7 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = []
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
-
-    def deactivate_account(self):
-        """
-        This makes a user's account inactive"""
-        self.is_active = False
-        self.save()
-
-    def reinstate(self):
-        """This allows for a users whose account was inactive to be reinstated
-        """
-        self.is_active = True
-        self.save()
-
-    @classmethod
-    def get_active(cls):
-        """This returns all the user with active accounts
-        """
-        return cls.objects.filter(is_active = True)
-
-    @classmethod
-    def get_inactive(cls):
-        """This returns all the users with inactive accounts
-        """
-        return cls.objects.filter(is_active = False)
+        return self.email
 
     def tokens(self):
         refresh = RefreshToken.for_user(self)
@@ -131,15 +119,6 @@ class User(AbstractBaseUser):
             'access': str(refresh.access_token)
         }
 
-MALE = "Male"
-FEMALE = "Female"
-RATHER_NOT_SAY = "Rather_Not_Say"
-
-gender_choices = (
-    (MALE,"Male"),
-    (FEMALE,"Female"),
-    (RATHER_NOT_SAY,"Rather_Not_Say")
-)
 class Profile(models.Model):
     """This is any changable info on the user
 
@@ -147,21 +126,11 @@ class Profile(models.Model):
         models ([type]): [description]
     """
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
-    phone_number = PhoneNumberField(region="KE")
+    phone_number = PhoneNumberField()
     bio = models.TextField()
     location = models.CharField(max_length=50)
     avatar = models.ImageField(upload_to="profiles/")
-    gender = models.CharField(max_length=50,choices=gender_choices)
     receive_notifications_via_email = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.first_name + "'s profile"
-
-class StaffProfile(models.Model):
-    """This holds information on a staff members assigned storage facility
-
-    Args:
-        models ([type]): [description]
-    """
-    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="staff_profile")
-    storage_facility = models.ForeignKey("storage.StorageFacility",on_delete=models.SET_NULL,null=True)
