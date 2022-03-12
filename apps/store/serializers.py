@@ -1,5 +1,3 @@
-from turtle import update
-from unicodedata import category
 from rest_framework import serializers
 
 from apps.store.models import *
