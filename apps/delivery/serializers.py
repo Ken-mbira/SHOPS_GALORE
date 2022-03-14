@@ -69,6 +69,9 @@ class DeliveryRegisteredMeansSerializer(serializers.ModelSerializer):
         return instance
 
 class DeliveryDestinationSerializer(serializers.ModelSerializer):
+    registered_means = DeliveryRegisteredMeansSerializer(read_only=True,source="means")
+    from_location = DeliveryLocationSerializer(read_only=True,source="location_from")
+    to_location = DeliveryLocationSerializer(read_only=True,source="location_to")
     class Meta:
         model = Destination
         fields = '__all__'
