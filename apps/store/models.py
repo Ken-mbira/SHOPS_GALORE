@@ -12,7 +12,6 @@ from apps.delivery.models import *
 
 class Shop(models.Model):
     """This defines involved in making a store
-
     Args:
         models ([type]): [description]
     """
