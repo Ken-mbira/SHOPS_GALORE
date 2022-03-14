@@ -43,7 +43,7 @@ class DeliveryRegisteredMeansImageSerializer(serializers.ModelSerializer):
         return instance
 
 class DeliveryRegisteredMeansSerializer(serializers.ModelSerializer):
-    means = DeliveryMeansSerializer()
+    delivery_means = DeliveryMeansSerializer(source='means',read_only=True)
     class Meta:
         model = RegisteredMeans
         fields = '__all__'
