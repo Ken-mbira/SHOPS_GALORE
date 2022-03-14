@@ -32,7 +32,18 @@ class DeliveryMeansSerializer(serializers.ModelSerializer):
         model = Means
         fields = '__all__'
 
+class DeliveryRegisteredMeansImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegisteredMeans
+        fields = ['image']
+
+    def update(self, instance, validated_data):
+        instance.image = validated_data['image']
+        instance.save()
+        return instance
+
 class DeliveryRegisteredMeansSerializer(serializers.ModelSerializer):
+    delivery_means = DeliveryMeansSerializer(source='means',read_only=True)
     class Meta:
         model = RegisteredMeans
         fields = '__all__'
@@ -48,8 +59,6 @@ class DeliveryRegisteredMeansSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        instance.means = validated_data['means']
-        instance.image = validated_data['image']
         instance.max_weight = validated_data['max_weight']
         instance.max_volume = validated_data['max_volume']
         instance.active = validated_data['active']

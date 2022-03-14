@@ -37,7 +37,7 @@ class RegisteredMeans(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name="registered_means")
     means = models.ForeignKey(Means,on_delete=models.PROTECT,related_name="registered_means")
     image = models.ImageField(upload_to="registered_means/",null=True,blank=True)
-    max_weight = models.DecimalField(max_digits=5,decimal_places=2)
+    max_weight = models.DecimalField(max_digits=10,decimal_places=2)
     max_volume = models.DecimalField(max_digits=5,decimal_places=2)
     active = models.BooleanField(default=True)
 

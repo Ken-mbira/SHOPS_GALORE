@@ -51,6 +51,13 @@ class DeliveryRegisteredMeansDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return RegisteredMeans.objects.filter(owner = self.request.user)
 
+class DeliveryRegisteredMeansImageDetailView(generics.UpdateAPIView):
+    serializer_class = DeliveryRegisteredMeansImageSerializer
+    pemission_classes = [permissions.IsAuthenticated & IsDeliveryPerson]
+
+    def get_queryset(self):
+        return RegisteredMeans.objects.filter(owner = self.request.user)
+
 class DeliveryDestinationListView(generics.ListCreateAPIView):
     serializer_class = DeliveryDestinationSerializer
     permission_classes = [permissions.IsAuthenticated]
