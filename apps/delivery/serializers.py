@@ -6,6 +6,11 @@ from apps.account.models import *
 from apps.store.models import *
 from apps.delivery.models import *
 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = ['id','name']
+
 class DeliveryLocationSerializer(serializers.ModelSerializer):
     """This handles the categories when its a get request
     Args:
@@ -70,8 +75,8 @@ class DeliveryRegisteredMeansSerializer(serializers.ModelSerializer):
 
 class DeliveryDestinationSerializer(serializers.ModelSerializer):
     registered_means = DeliveryRegisteredMeansSerializer(read_only=True,source="means")
-    from_location = DeliveryLocationSerializer(read_only=True,source="location_from")
-    to_location = DeliveryLocationSerializer(read_only=True,source="location_to")
+    from_location = LocationSerializer(read_only=True,source="location_from")
+    to_location = LocationSerializer(read_only=True,source="location_to")
     class Meta:
         model = Destination
         fields = '__all__'
