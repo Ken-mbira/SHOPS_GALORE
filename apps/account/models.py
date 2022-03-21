@@ -90,7 +90,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(verbose_name='email',unique=True)
     role = models.CharField(max_length=50,choices=roles)
     first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50,null=True,blank=True)
     member_since = models.DateTimeField(auto_now_add=True,editable=False)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
