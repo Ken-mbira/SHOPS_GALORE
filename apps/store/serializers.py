@@ -20,6 +20,7 @@ class LocationStoreSerializer(serializers.ModelSerializer):
 
 class StoreShopSerializer(serializers.ModelSerializer):
     product_count = serializers.IntegerField(read_only=True)
+    shop_pickup_location = LocationStoreSerializer(read_only=True,source="pickup_location")
     class Meta:
         model = Shop
         fields = '__all__'
